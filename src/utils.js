@@ -29,6 +29,20 @@ export const deleteFromOpfs = async (kind, cardId) => {
     } catch { /* File belum ada, abaikan */ }
 };
 
+// --- HELPER: KONVERSI FILE/BLOB KE BASE64 (generate on-demand) ---
+export const fileToBase64 = (file) => {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => {
+            const dataUrl = reader.result;
+            const b64 = dataUrl.split(',')[1];
+            resolve(b64);
+        };
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+    });
+};
+
 export const hslToHex = (h, s, l) => {
     l /= 100;
     const a = s * Math.min(l, 1 - l) / 100;
