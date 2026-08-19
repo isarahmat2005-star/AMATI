@@ -115,7 +115,20 @@ export default function App() {
 
     useEffect(() => {
         if (previewModal?.mode === 'render' && previewTab === 'base64') {
-            getFromOpfs('base64', previewModal.id).then(f => f.text()).then(setBase64Preview).catch(() => setBase64Preview('Error membaca data Base64.'));
+            setBase64Preview('Memuat...');
+            getFromOpfs('base64', previewModal.id)
+                .then(f => f.text())
+                .then(setBase64Preview)
+                .catch(async () => {
+                    try {
+                        const mp4File = await getFromOpfs('mp4', previewModal.id);
+                        const b64 = await fileToBase64(mp4File);
+                        setBase64Preview(b64);
+                        await saveToOpfs('base64', previewModal.id, b64); // cache untuk next time
+                    } catch {
+                        setBase64Preview('Gagal membuat data Base64 — file MP4 tidak ditemukan.');
+                    }
+                });
         }
     }, [previewModal?.id, previewTab]);
 
@@ -732,9 +745,6 @@ FOKUS UTAMA: Output HARUS dalam format JSON murni dengan struktur array "bluepri
                                 const videoBlob = await vidResponse.blob();
                                 
                                 await saveToOpfs('mp4', task.id, videoBlob);
-                                if (renderExportType === 'base64') {
-                                    await saveToOpfs('base64', task.id, b64Data);
-                                }
 
                                 setCards(prev => prev.map(c => c.id === task.id ? { ...c, status: 'done', hasFile: true, renderProgress: null } : c));
                             } else { 
@@ -786,7 +796,19 @@ FOKUS UTAMA: Output HARUS dalam format JSON murni dengan struktur array "bluepri
         let done = 0;
         for (const card of cardList) {
             try {
-                const file = await getFromOpfs(kind, card.id);
+                let file;
+                try {
+                    file = await getFromOpfs(kind, card.id);
+                } catch {
+                    if (kind === 'base64') {
+                        const mp4File = await getFromOpfs('mp4', card.id);
+                        const b64 = await fileToBase64(mp4File);
+                        await saveToOpfs('base64', card.id, b64);
+                        file = await getFromOpfs('base64', card.id);
+                    } else {
+                        throw new Error('File MP4 tidak ditemukan di OPFS');
+                    }
+                }
                 const ext = kind === 'mp4' ? 'mp4' : 'txt';
                 const suffix = currentInputMode === 'render' ? (kind === 'base64' ? '_B64' : '') : `-${generateRandomSuffix()}`;
                 yield { name: `${card.title}${suffix}.${ext}`, input: file };
