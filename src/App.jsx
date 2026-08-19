@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { CustomSpinner, ClockIcon, CheckCircleIcon, XCircleIcon, TrashIcon, SparklesIcon, Wand2Icon, PlayIcon, PauseIcon, DownloadIcon, FileTextIcon, EyeIcon, EditIcon, AlertTriangleIcon, ChevronDownIcon, PlusIcon, CopyIcon, UploadCloudIcon, CodeIcon, SendIcon, TypeIcon, FileIcon, BriefcaseIcon, CoffeeIcon, UndoIcon, RedoIcon, SettingsIcon } from './icons';
 import { HUGGING_FACE_URLS, CATEGORIES, BUILTIN_STYLE_DETAILS, RATIOS, RESOLUTIONS, DIMENSIONS, DURATIONS, SYSTEM_LAYER_1, SYSTEM_LAYER_2, SYSTEM_LAYER_3, SYSTEM_LAYER_4, SYSTEM_LAYER_5, SYSTEM_LAYER_6, SYSTEM_LAYER_7 } from './constants';
-import { R, getOpfsDir, saveToOpfs, getFromOpfs, deleteFromOpfs, hslToHex, wrapSvgAsHtml, generateRandomTaskID, generateRandomSuffix } from './utils';
+import { R, getOpfsDir, saveToOpfs, getFromOpfs, deleteFromOpfs, fileToBase64, hslToHex, wrapSvgAsHtml, generateRandomTaskID, generateRandomSuffix } from './utils';
 
 // --- KOMPONEN PLAYER VIDEO OPFS KHUSUS ---
 const OpfsVideoPlayer = ({ cardId }) => {
