@@ -249,14 +249,11 @@ export default function App() {
           if (data.success) {
               setLoginState('success');
               showToast("Selamat Datang Kembali", "success");
-              
-              // Simpan sesi
               localStorage.setItem('metal_session', JSON.stringify({ email: loginEmail }));
               setAuthEmail(loginEmail);
-              
-              // Transisi instan ke main app tanpa delay
-              setIsAuthenticated(true);
-              loadInitialData();
+              setTimeout(() => {
+                setIsAuthenticated(true);
+            }, 300);
               
           } else {
               setLoginState('failed');
