@@ -1134,7 +1134,7 @@ FOKUS UTAMA: Output HARUS dalam format JSON murni dengan struktur array "bluepri
             `}</style>
             
             {/* GLOBAL TOAST NOTIFICATION */}
-            <div className="fixed inset-0 flex items-center justify-center bg-slate-100 overflow-hidden" style={{ fontFamily: "'Share Tech', sans-serif", backgroundImage: 'linear-gradient(rgba(8, 145, 179, 0.08) 1px, transparent 1px), linear-gradient(90deg, rgba(8, 145, 179, 0.08) 1px, transparent 1px)', backgroundSize: '20px 20px' }}>
+            <div className="fixed inset-0 flex items-center justify-center bg-slate-100 overflow-hidden" style={{ fontFamily: "'Share Tech', sans-serif" }}>
                 <div className={`px-4 py-3 rounded-lg shadow-lg flex items-center gap-3 border ${toast.type === 'error' ? 'bg-red-50 border-red-200 text-red-700' : 'bg-emerald-50 border-emerald-200 text-emerald-700'}`}>
                     {toast.type === 'error' ? <AlertTriangleIcon className="w-5 h-5"/> : <CheckCircleIcon className="w-5 h-5"/>}
                     <span className="font-bold text-sm tracking-wide">{toast.message}</span>
