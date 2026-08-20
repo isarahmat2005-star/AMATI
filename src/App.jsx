@@ -252,8 +252,9 @@ export default function App() {
               showToast("Selamat Datang Kembali", "success");
               localStorage.setItem('amati_session', JSON.stringify({ email: loginEmail }));
               setAuthEmail(loginEmail);
-              setIsAuthenticated(true);
-              loadInitialData();
+              setTimeout(() => {
+                setIsAuthenticated(true);
+              }, 300);
               
           } else {
               setLoginState('failed');
