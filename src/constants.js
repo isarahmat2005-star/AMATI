@@ -17,9 +17,9 @@ export const SYSTEM_LAYER_1 = `LAPIS 1 - FORMAT OUTPUT (ATURAN MUTLAK):
 
 export const SYSTEM_LAYER_2 = `LAPIS 2 - ATURAN PEMBUATAN ELEMEN (FUNGSI CREATE) & STRATEGI WARNA (VON RESTORFF):
 - Semua elemen vektor (path, rect, circle, dll) WAJIB dibuat SATU KALI saja di dalam fungsi create() menggunakan document.createElementNS("http://www.w3.org/2000/svg", "nama_tag").
-- Pastikan memiliki Background (buat elemen rect paling pertama dengan width/height 100%) kecuali diminta transparan.
-- Simpan referensi elemen yang ingin dianimasikan ke dalam state internal svg. Contoh: svg._state = {}; svg._state.circle1 = myCircle;
-- Sisakan Safe Margin minimal 10% dari tepi viewBox untuk ruang aman teks overlay (Aturan Wajib Microstock).
+- KEBERSIHAN BACKGROUND (WAJIB): Buat elemen rect paling pertama (width/height 100%) sebagai background. Background WAJIB warna solid/gradient bersih. DILARANG KERAS menambahkan tekstur noise, grain acak, atau vignette gelap di sudut kanvas. (Focus Glow dari Lapis 7 tetap diperbolehkan).
+- ID DESKRIPTIF (WAJIB): Setiap elemen SVG penting WAJIB diberi atribut \`id\` yang deskriptif (contoh: \`id="core-icon"\`, \`id="glow-effect"\`). DILARANG menggunakan id generik seperti \`el1\` atau \`rect2\`. Simpan juga referensinya ke dalam state internal svg (contoh: \`svg._state.coreIcon = coreIconEl;\`).
+- KOMPOSISI TERPUSAT & SAFE MARGIN: Subjek utama WAJIB berada tepat di tengah kanvas secara visual, dikelilingi Safe Margin minimal 10% dari tepi viewBox untuk ruang aman teks overlay (Aturan Wajib Microstock).
 - STRATEGI WARNA (LANGKAH 1 - HARMONI): Pilih 1 Hue dasar. Prioritaskan harmoni Complementary, Triadic, atau Split Complementary. Gunakan Analogous/Monochromatic hanya jika diminta.
 - STRATEGI WARNA (LANGKAH 2 - PROPORSI 60-30-10): Petakan harmoni ke aturan 60-30-10. Complementary (2 Hue): Dominan+Sekunder = Hue A beda Lightness, Aksen = Hue B (Hue+180). Triadic/Split Complementary/Analogous (3 Hue): Gelap = Dominan, Medium = Sekunder, Paling Kontras = Aksen.
 - STRATEGI WARNA (LANGKAH 3 - KONTRAS OBJEK-BACKGROUND & ISOLASI): Warna Sekunder (objek/konten utama: card, bubble, ikon) WAJIB memiliki contrast ratio MINIMAL 3:1 terhadap warna Dominan (background) — ini WAJIB berlaku untuk SEMUA objek, bukan cuma 1 elemen. Selain itu, warna Aksen WAJIB saturation tinggi (70-100%, BUKAN pastel/pudar) dan contrast ratio ≥4.5:1 terhadap Dominan, dipakai HANYA pada TEPAT SATU elemen fokus utama (sama dengan elemen bergerak paling dominan). DILARANG memberi warna Aksen ke lebih dari 1 objek, tapi SEMUA objek tetap WAJIB kontras jelas terhadap background sesuai rasio minimal di atas.`;
@@ -35,6 +35,7 @@ export const SYSTEM_LAYER_3 = `LAPIS 3 - MATEMATIKA MOTION & ANTI-MEMORY LEAK (F
 
 export const SYSTEM_LAYER_4 = `LAPIS 4 - KUALITAS MOTION PROFESIONAL (ATURAN MUTLAK):
 - HIERARKI & BATAS GERAK: Tentukan 1-2 elemen utama sebagai titik fokus gerak. Elemen pendukung (background/ornamen) WAJIB bergerak minim atau statis. DILARANG membuat semua elemen sibuk bergerak bersamaan.
+- SKALA SUBJEK UTAMA (WAJIB): Elemen/subjek utama animasi WAJIB berukuran cukup besar untuk mengisi minimal 40-60% area kanvas. Detail visual wajib terbaca jelas saat di-preview dalam ukuran thumbnail kecil.
 - ANTI-COVER-KOSONG (HUKUM MICROSTOCK): Frame pertama (t=0) WAJIB menampilkan komposisi penuh secara utuh! DILARANG menggunakan animasi memudar dari kosong (opacity 0 ke 1) sebagai entrance di awal siklus. Untuk efek Entrance/Staggering di awal waktu, WAJIB gunakan teknik SETTLE: elemen sudah memiliki opacity 1 sejak t=0, tetapi bergerak mengendap dari sedikit offset posisi (translate) atau skala kecil (0.8-0.9) menuju posisi normalnya. Pengecualian: Opacity 0→1 HANYA boleh dipakai di tengah durasi (untuk transisi antar-scene) atau pada ornamen dekoratif kecil.
 - STAGGERING WAJIB: Untuk elemen jamak (list, baris, ikon), WAJIB gunakan delay matematis bertahap (contoh: t - (index * 0.2)). DILARANG memunculkan elemen sejenis secara serentak.
 - VARIASI DURASI JAMAK: Selain delay/stagger, berikan variasi kecepatan pada elemen berjejer. Gunakan pengali/pembagi waktu (misal: localT / (1 + (index % 3) * 0.2)). WAJIB gunakan clamp (Math.max(0, Math.min(1, nilai))) agar progress animasi tidak pernah melewati rentang 0 hingga 1.
@@ -54,7 +55,6 @@ export const SYSTEM_LAYER_7 = `LAPIS 7 - SINEMATOGRAFI & KESEIMBANGAN EFEK:
 - CAMERA DRIFT HALUS (KEN BURNS): Untuk efek sinematik, bungkus seluruh elemen dalam satu <g id="cameraGroup">. WAJIB gunakan rumus kompensasi pivot tengah ini di fungsi update() agar zoom tidak memotong pinggir layar: const s = 1 + (Math.sin(time * 0.2) * 0.03); const cx = width/2; const cy = height/2; cameraGroup.setAttribute('transform', \`translate(\${cx*(1-s)}, \${cy*(1-s)}) scale(\${s})\`);. Gunakan waktu absolut murni (time).
 - FOCUS PULSE: Elemen fokus utama boleh diberi bentuk dasar ber-opacity sangat rendah (5-10%) di belakangnya yang berdenyut ukurannya perlahan (menggunakan Math.sin(time) tanpa batas) untuk menarik perhatian. DILARANG menggunakan SVG filter blur (<filter>) karena rawan error.
 - ATURAN PENYEIMBANG (SUPER KRITIS): Semua keahlian Fisika/Sihir di Lapis 4, 5, dan 6 TIDAK WAJIB ditumpuk pada satu elemen. PILIH maksimal 1-2 teknik saja per elemen. (Misal: Ikon boleh Bouncy + Arc, tapi Kartu UI cukup Stagger + Overshoot). Elemen background cukup bergerak minimal. DILARANG KERAS memaksa semua elemen berdistorsi dan melengkung bersamaan, itu akan membuat animasi norak dan berlebihan (Over-engineered).`;
-
 export const CATEGORIES = [
     "None", "Skeleton UI Mockup", "Filled Outline Vektor", "Diagram UI",
     "Flat Vektor Line Art", "Line Drawing", "Animasi Vektor Berantai",
