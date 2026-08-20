@@ -9,11 +9,15 @@ import { R, getOpfsDir, saveToOpfs, getFromOpfs, deleteFromOpfs, fileToBase64, h
 // =====================================================================
 const GAS_AUTH_URL = "https://script.google.com/macros/s/AKfycbxkoD96dcvAmMs7X-yK_3N7W2aNlE4kdd6R3HHVm3BFxOCRQ7yFnILsdE2Pe3uKGI65Gw/exec";
 
-// --- INDEXED DB UNTUK DEVICE ID ---
+// --- INDEXED DB UNTUK DEVICE ID & AUTO-SAVE ---
 const META_STORE_NAME = 'meta_store';
+const CARDS_STORE_NAME = 'cards_store';
+const BLUEPRINTS_STORE_NAME = 'blueprints_store';
+const UPLOADED_FILES_STORE_NAME = 'uploaded_files_store';
+
 const initMetaDB = () => {
     return new Promise((resolve, reject) => {
-        const request = indexedDB.open('AmatiMetaDB', 1);
+        const request = indexedDB.open('AmatiMetaDB', 2); // Versi dinaikkan ke 2
         request.onerror = (e) => reject("IndexedDB error: " + e.target.errorCode);
         request.onsuccess = (e) => resolve(e.target.result);
         request.onupgradeneeded = (e) => {
@@ -21,9 +25,20 @@ const initMetaDB = () => {
             if (!db.objectStoreNames.contains(META_STORE_NAME)) {
                 db.createObjectStore(META_STORE_NAME, { keyPath: 'key' });
             }
+            if (!db.objectStoreNames.contains(CARDS_STORE_NAME)) {
+                db.createObjectStore(CARDS_STORE_NAME, { keyPath: 'id' });
+            }
+            if (!db.objectStoreNames.contains(BLUEPRINTS_STORE_NAME)) {
+                db.createObjectStore(BLUEPRINTS_STORE_NAME, { keyPath: 'id' });
+            }
+            if (!db.objectStoreNames.contains(UPLOADED_FILES_STORE_NAME)) {
+                db.createObjectStore(UPLOADED_FILES_STORE_NAME, { keyPath: 'id' });
+            }
         };
     });
 };
+
+// --- HELPER CRUD DB ---
 const saveDeviceIdToDB = async (id) => {
     try {
         const db = await initMetaDB();
@@ -42,6 +57,114 @@ const loadDeviceIdFromDB = () => {
         } catch (err) { resolve(null); }
     });
 };
+
+// Cards Helper (Text & File mode saja)
+const saveCardToDB = async (card) => {
+    if (card.mode === 'render') return;
+    try {
+        const db = await initMetaDB();
+        const tx = db.transaction(CARDS_STORE_NAME, 'readwrite');
+        tx.objectStore(CARDS_STORE_NAME).put(card);
+    } catch (err) { console.error('Gagal simpan card:', err); }
+};
+const loadCardsFromDB = () => {
+    return new Promise(async (resolve) => {
+        try {
+            const db = await initMetaDB();
+            const tx = db.transaction(CARDS_STORE_NAME, 'readonly');
+            const req = tx.objectStore(CARDS_STORE_NAME).getAll();
+            req.onsuccess = () => resolve(req.result || []);
+            req.onerror = () => resolve([]);
+        } catch (err) { resolve([]); }
+    });
+};
+const deleteCardFromDB = async (id) => {
+    try {
+        const db = await initMetaDB();
+        const tx = db.transaction(CARDS_STORE_NAME, 'readwrite');
+        tx.objectStore(CARDS_STORE_NAME).delete(id);
+    } catch (err) { console.error('Gagal hapus card:', err); }
+};
+const clearCardsFromDB = async () => {
+    try {
+        const db = await initMetaDB();
+        const tx = db.transaction(CARDS_STORE_NAME, 'readwrite');
+        tx.objectStore(CARDS_STORE_NAME).clear();
+    } catch (err) { console.error('Gagal clear cards:', err); }
+};
+
+// Blueprints Helper
+const saveBlueprintToDB = async (bp) => {
+    try {
+        const db = await initMetaDB();
+        const tx = db.transaction(BLUEPRINTS_STORE_NAME, 'readwrite');
+        tx.objectStore(BLUEPRINTS_STORE_NAME).put(bp);
+    } catch (err) { console.error('Gagal simpan blueprint:', err); }
+};
+const loadBlueprintsFromDB = () => {
+    return new Promise(async (resolve) => {
+        try {
+            const db = await initMetaDB();
+            const tx = db.transaction(BLUEPRINTS_STORE_NAME, 'readonly');
+            const req = tx.objectStore(BLUEPRINTS_STORE_NAME).getAll();
+            req.onsuccess = () => resolve(req.result || []);
+            req.onerror = () => resolve([]);
+        } catch (err) { resolve([]); }
+    });
+};
+const deleteBlueprintFromDB = async (id) => {
+    try {
+        const db = await initMetaDB();
+        const tx = db.transaction(BLUEPRINTS_STORE_NAME, 'readwrite');
+        tx.objectStore(BLUEPRINTS_STORE_NAME).delete(id);
+    } catch (err) { console.error('Gagal hapus blueprint:', err); }
+};
+const clearBlueprintsFromDB = async () => {
+    try {
+        const db = await initMetaDB();
+        const tx = db.transaction(BLUEPRINTS_STORE_NAME, 'readwrite');
+        tx.objectStore(BLUEPRINTS_STORE_NAME).clear();
+    } catch (err) { console.error('Gagal clear blueprints:', err); }
+};
+
+// Uploaded Files Helper
+const saveUploadedFileToDB = async (file) => {
+    try {
+        const db = await initMetaDB();
+        const tx = db.transaction(UPLOADED_FILES_STORE_NAME, 'readwrite');
+        const { url, ...storable } = file; // Buang blob sementara
+        tx.objectStore(UPLOADED_FILES_STORE_NAME).put(storable);
+    } catch (err) { console.error('Gagal simpan file:', err); }
+};
+const loadUploadedFilesFromDB = () => {
+    return new Promise(async (resolve) => {
+        try {
+            const db = await initMetaDB();
+            const tx = db.transaction(UPLOADED_FILES_STORE_NAME, 'readonly');
+            const req = tx.objectStore(UPLOADED_FILES_STORE_NAME).getAll();
+            req.onsuccess = () => {
+                const restored = (req.result || []).map(f => ({ ...f, url: f.base64 }));
+                resolve(restored);
+            };
+            req.onerror = () => resolve([]);
+        } catch (err) { resolve([]); }
+    });
+};
+const deleteUploadedFileFromDB = async (id) => {
+    try {
+        const db = await initMetaDB();
+        const tx = db.transaction(UPLOADED_FILES_STORE_NAME, 'readwrite');
+        tx.objectStore(UPLOADED_FILES_STORE_NAME).delete(id);
+    } catch (err) { console.error('Gagal hapus file:', err); }
+};
+const clearUploadedFilesFromDB = async () => {
+    try {
+        const db = await initMetaDB();
+        const tx = db.transaction(UPLOADED_FILES_STORE_NAME, 'readwrite');
+        tx.objectStore(UPLOADED_FILES_STORE_NAME).clear();
+    } catch (err) { console.error('Gagal clear files:', err); }
+};
+
 
 // --- KOMPONEN PLAYER VIDEO OPFS KHUSUS ---
 const OpfsVideoPlayer = ({ cardId }) => {
@@ -80,7 +203,7 @@ export default function App() {
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const [authEmail, setAuthEmail] = useState('');
     const [loginEmail, setLoginEmail] = useState('');
-    const [loginState, setLoginState] = useState('idle'); // idle, loading, success, failed
+    const [loginState, setLoginState] = useState('idle'); 
     const [deviceId, setDeviceId] = useState('');
     const [showFullEmail, setShowFullEmail] = useState(false);
     const [logoutConfirm, setLogoutConfirm] = useState(false);
@@ -164,8 +287,27 @@ export default function App() {
     const isPausedRef = useRef(false);
     const isGeneratingRef = useRef(false);
     const abortControllerRef = useRef(null);
+    const cardsSyncTimeout = useRef(null);
 
-    useEffect(() => { cardsRef.current = cards; }, [cards]);
+    // --- AUTO-SYNC KE DB ---
+    useEffect(() => {
+        cardsRef.current = cards;
+        if (!isAuthenticated) return;
+        clearTimeout(cardsSyncTimeout.current);
+        cardsSyncTimeout.current = setTimeout(() => {
+            cards.filter(c => c.mode !== 'render').forEach(c => saveCardToDB(c));
+        }, 800);
+    }, [cards, isAuthenticated]);
+
+    useEffect(() => {
+        if (!isAuthenticated) return;
+        blueprints.forEach(bp => saveBlueprintToDB(bp));
+    }, [blueprints, isAuthenticated]);
+
+    useEffect(() => {
+        if (!isAuthenticated) return;
+        uploadedFilesData.forEach(f => saveUploadedFileToDB(f));
+    }, [uploadedFilesData, isAuthenticated]);
 
     useEffect(() => {
         const link = document.createElement('link');
@@ -175,6 +317,21 @@ export default function App() {
         const timer = setInterval(() => setCurrentTime(new Date()), 1000);
         return () => clearInterval(timer);
     }, []);
+
+    const loadInitialData = async () => {
+        const [savedCards, savedBlueprints, savedFiles] = await Promise.all([
+            loadCardsFromDB(),
+            loadBlueprintsFromDB(),
+            loadUploadedFilesFromDB(),
+        ]);
+
+        if (savedCards.length > 0) {
+            const cleaned = savedCards.map(c => c.status === 'processing' ? { ...c, status: 'pending' } : c);
+            setCards(cleaned);
+        }
+        if (savedBlueprints.length > 0) setBlueprints(savedBlueprints);
+        if (savedFiles.length > 0) setUploadedFilesData(savedFiles);
+    };
 
     // --- INIT AUTH & DEVICE ID ---
     useEffect(() => {
@@ -203,7 +360,7 @@ export default function App() {
                 const parsedSession = JSON.parse(session);
                 setIsAuthenticated(true);
                 setAuthEmail(parsedSession.email);
-                loadInitialData();
+                loadInitialData(); // Load Data setelah login terverifikasi
             }
         };
         initAuth();
@@ -229,55 +386,46 @@ export default function App() {
     }, [previewModal?.id, previewTab]);
 
     const handleLogin = async () => {
-      if (!loginEmail.trim()) {
-          showToast("Masukkan email terlebih dahulu", "error");
-          return;
-      }
-      
-      setLoginState('loading');
-      
-      try {
-          const res = await fetch(GAS_AUTH_URL, {
-              method: 'POST',
-              mode: 'cors',
-              redirect: 'follow',
-              headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-              body: JSON.stringify({ action: 'login', email: loginEmail, deviceId: deviceId })
-          });
-          
-          const data = await res.json();
-          
-          if (data.success) {
-              setLoginState('success');
-              showToast("Selamat Datang Kembali", "success");
-              localStorage.setItem('amati_session', JSON.stringify({ email: loginEmail }));
-              setAuthEmail(loginEmail);
-              setTimeout(() => {
-                setIsAuthenticated(true);
-              }, 300);
-              
-          } else {
-              setLoginState('failed');
-              // Tampilkan pesan error dari GAS
-              if (data.message === "Max Device Terpakai") {
-                  showToast("Max Device Terpakai", "error");
-              } else if (data.message === "Email Tidak Terdaftar") {
-                  showToast("Email Tidak Terdaftar", "error");
-              } else {
-                  showToast(data.message || "Gagal Login", "error");
-              }
-              
-              setTimeout(() => setLoginState('idle'), 1500);
-          }
-          
-      } catch (err) {
-          console.error("Auth error:", err);
-          setLoginState('failed');
-          showToast("Koneksi gagal. Cek internet atau URL Satpam.", "error");
-          setTimeout(() => setLoginState('idle'), 1500);
-      }
-  };
-
+        if (!loginEmail.trim()) {
+            showToast("Masukkan email terlebih dahulu", "error");
+            return;
+        }
+        setLoginState('loading');
+        try {
+            const res = await fetch(GAS_AUTH_URL, {
+                method: 'POST',
+                mode: 'cors',
+                redirect: 'follow',
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                body: JSON.stringify({ action: 'login', email: loginEmail, deviceId: deviceId })
+            });
+            const data = await res.json();
+            if (data.success) {
+                setLoginState('success');
+                showToast("Selamat Datang Kembali", "success");
+                localStorage.setItem('amati_session', JSON.stringify({ email: loginEmail }));
+                setAuthEmail(loginEmail);
+                setTimeout(() => {
+                    setIsAuthenticated(true);
+                    loadInitialData(); // Load Data saat login berhasil
+                }, 800);
+            } else {
+                setLoginState('failed');
+                if (data.message === "Max Device Terpakai") {
+                    showToast("Max Device Terpakai", "error");
+                } else if (data.message === "Email Tidak Terdaftar") {
+                    showToast("Email Tidak Terdaftar", "error");
+                } else {
+                    showToast(data.message || "Gagal Login", "error");
+                }
+                setTimeout(() => setLoginState('idle'), 1500);
+            }
+        } catch (err) {
+            setLoginState('failed');
+            showToast("Koneksi gagal. Cek internet atau URL Satpam.", "error");
+            setTimeout(() => setLoginState('idle'), 1500);
+        }
+    };
 
     const handleLogout = () => {
         fetch(GAS_AUTH_URL, {
@@ -288,10 +436,16 @@ export default function App() {
             body: JSON.stringify({ action: 'logout', email: authEmail, deviceId })
         }).catch(err => console.error("Gagal logout:", err));
 
+        clearCardsFromDB();
+        clearBlueprintsFromDB();
+        clearUploadedFilesFromDB();
+
         localStorage.removeItem('amati_session');
         setIsAuthenticated(false);
         setAuthEmail('');
-        setFiles([]);
+        setCards([]);
+        setBlueprints([]);
+        setUploadedFilesData([]);
         window.location.reload();
     };
 
@@ -951,6 +1105,8 @@ FOKUS UTAMA: Output HARUS dalam format JSON murni dengan struktur array "bluepri
         const toDelete = cards.filter(c => inputMode === 'render' ? c.mode === 'render' : c.mode !== 'render');
         if (inputMode === 'render') {
             await Promise.all(toDelete.flatMap(c => [deleteFromOpfs('mp4', c.id), deleteFromOpfs('base64', c.id)]));
+        } else {
+            await clearCardsFromDB();
         }
         
         setCards(prev => prev.filter(c => inputMode === 'render' ? c.mode !== 'render' : c.mode === 'render')); 
@@ -1136,7 +1292,7 @@ FOKUS UTAMA: Output HARUS dalam format JSON murni dengan struktur array "bluepri
             </div>
         );
     }
-    
+
     return (
         <>
             <style>{`
@@ -1933,6 +2089,8 @@ FOKUS UTAMA: Output HARUS dalam format JSON murni dengan struktur array "bluepri
                                     if(inputMode === 'render') {
                                         await deleteFromOpfs('mp4', fileToDelete);
                                         await deleteFromOpfs('base64', fileToDelete);
+                                    } else {
+                                        await deleteCardFromDB(fileToDelete);
                                     }
                                     setCards(prev => prev.filter(f => f.id !== fileToDelete)); 
                                     setFileToDelete(null); 
@@ -1964,7 +2122,11 @@ FOKUS UTAMA: Output HARUS dalam format JSON murni dengan struktur array "bluepri
                             <p className="text-sm text-slate-600 mt-2 mb-6">Anda yakin ingin menghapus blueprint ini dari daftar?</p>
                             <div className="flex w-full gap-3">
                                 <button onClick={() => setBlueprintToDeleteConfirm(null)} className="flex-1 bg-slate-200 text-slate-700 font-bold py-2 rounded hover:bg-slate-300 transition text-xs shadow-sm">Batal</button>
-                                <button onClick={() => { setBlueprints(prev => prev.filter(b => b.id !== blueprintToDeleteConfirm)); setBlueprintToDeleteConfirm(null); }} className="flex-1 bg-red-600 text-white font-bold py-2 rounded hover:bg-red-700 transition shadow-sm text-xs">Ya, Hapus</button>
+                                <button onClick={async () => { 
+                                    await deleteBlueprintFromDB(blueprintToDeleteConfirm);
+                                    setBlueprints(prev => prev.filter(b => b.id !== blueprintToDeleteConfirm)); 
+                                    setBlueprintToDeleteConfirm(null); 
+                                }} className="flex-1 bg-red-600 text-white font-bold py-2 rounded hover:bg-red-700 transition shadow-sm text-xs">Ya, Hapus</button>
                             </div>
                         </div>
                     </div>
@@ -1978,7 +2140,11 @@ FOKUS UTAMA: Output HARUS dalam format JSON murni dengan struktur array "bluepri
                             <p className="text-sm text-slate-600 mt-2 mb-6">Seluruh blueprint yang ada di daftar akan dihapus permanen.</p>
                             <div className="flex w-full gap-3">
                                 <button onClick={() => setClearAllBlueprintsConfirm(false)} className="flex-1 bg-slate-200 text-slate-700 font-bold py-2 rounded hover:bg-slate-300 transition text-xs shadow-sm">Batal</button>
-                                <button onClick={() => { setBlueprints([]); setClearAllBlueprintsConfirm(false); }} className="flex-1 bg-red-600 text-white font-bold py-2 rounded hover:bg-red-700 transition shadow-sm text-xs">Ya, Kosongkan</button>
+                                <button onClick={async () => { 
+                                    await clearBlueprintsFromDB();
+                                    setBlueprints([]); 
+                                    setClearAllBlueprintsConfirm(false); 
+                                }} className="flex-1 bg-red-600 text-white font-bold py-2 rounded hover:bg-red-700 transition shadow-sm text-xs">Ya, Kosongkan</button>
                             </div>
                         </div>
                     </div>
@@ -1992,8 +2158,11 @@ FOKUS UTAMA: Output HARUS dalam format JSON murni dengan struktur array "bluepri
                             <p className="text-sm text-slate-600 mt-2 mb-6">Anda yakin ingin menghapus referensi file ini dari antrean?</p>
                             <div className="flex w-full gap-3">
                                 <button onClick={() => setFileToDeleteConfirm(null)} className="flex-1 bg-slate-200 text-slate-700 font-bold py-2 rounded hover:bg-slate-300 transition text-xs shadow-sm">Batal</button>
-                                <button onClick={() => {
-                                    if(inputMode === 'file') setUploadedFilesData(prev => prev.filter(f => f.id !== fileToDeleteConfirm));
+                                <button onClick={async () => {
+                                    if(inputMode === 'file') {
+                                        await deleteUploadedFileFromDB(fileToDeleteConfirm);
+                                        setUploadedFilesData(prev => prev.filter(f => f.id !== fileToDeleteConfirm));
+                                    }
                                     setFileToDeleteConfirm(null);
                                 }} className="flex-1 bg-red-600 text-white font-bold py-2 rounded hover:bg-red-700 transition shadow-sm text-xs">Ya, Hapus</button>
                             </div>
@@ -2009,8 +2178,11 @@ FOKUS UTAMA: Output HARUS dalam format JSON murni dengan struktur array "bluepri
                             <p className="text-sm text-slate-600 mt-2 mb-6">Seluruh file di dalam kotak ini akan dihapus.</p>
                             <div className="flex w-full gap-3">
                                 <button onClick={() => setClearAllFilesConfirm(false)} className="flex-1 bg-slate-200 text-slate-700 font-bold py-2 rounded hover:bg-slate-300 transition text-xs shadow-sm">Batal</button>
-                                <button onClick={() => {
-                                    if(inputMode === 'file') setUploadedFilesData([]);
+                                <button onClick={async () => {
+                                    if(inputMode === 'file') {
+                                        await clearUploadedFilesFromDB();
+                                        setUploadedFilesData([]);
+                                    }
                                     setClearAllFilesConfirm(false);
                                 }} className="flex-1 bg-red-600 text-white font-bold py-2 rounded hover:bg-red-700 transition shadow-sm text-xs">Ya, Kosongkan</button>
                             </div>
