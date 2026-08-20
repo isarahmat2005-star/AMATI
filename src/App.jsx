@@ -249,7 +249,7 @@ export default function App() {
           if (data.success) {
               setLoginState('success');
               showToast("Selamat Datang Kembali", "success");
-              localStorage.setItem('metal_session', JSON.stringify({ email: loginEmail }));
+              localStorage.setItem('amati_session', JSON.stringify({ email: loginEmail }));
               setAuthEmail(loginEmail);
               setTimeout(() => {
                 setIsAuthenticated(true);
