@@ -203,6 +203,7 @@ export default function App() {
                 const parsedSession = JSON.parse(session);
                 setIsAuthenticated(true);
                 setAuthEmail(parsedSession.email);
+                loadInitialData();
             }
         };
         initAuth();
@@ -289,6 +290,7 @@ export default function App() {
         localStorage.removeItem('amati_session');
         setIsAuthenticated(false);
         setAuthEmail('');
+        setFiles([]);
         window.location.reload();
     };
 
