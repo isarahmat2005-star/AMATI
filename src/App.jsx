@@ -243,12 +243,16 @@ export default function App() {
             });
             const data = await res.json();
             if (data.success) {
-                setLoginState('success');
-                showToast("Selamat Datang Kembali", "success");
-                localStorage.setItem('amati_session', JSON.stringify({ email: loginEmail }));
-                setAuthEmail(loginEmail);
-                setIsAuthenticated(true);
-                loadInitialData();
+              setLoginState('success');
+              showToast("Selamat Datang Kembali", "success");
+              
+              // Simpan sesi
+              localStorage.setItem('metal_session', JSON.stringify({ email: loginEmail }));
+              setAuthEmail(loginEmail);
+              
+              // Transisi instan ke main app tanpa delay
+              setIsAuthenticated(true);
+              loadInitialData();
                 
             } else {
                 setLoginState('failed');
