@@ -247,9 +247,9 @@ export default function App() {
                 showToast("Selamat Datang Kembali", "success");
                 localStorage.setItem('amati_session', JSON.stringify({ email: loginEmail }));
                 setAuthEmail(loginEmail);
-                setTimeout(() => {
-                    setIsAuthenticated(true);
-                }, 500);    
+                setIsAuthenticated(true);
+                loadInitialData();
+                
             } else {
                 setLoginState('failed');
                 if (data.message === "Max Device Terpakai") {
