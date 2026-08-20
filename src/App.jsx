@@ -228,21 +228,25 @@ export default function App() {
     }, [previewModal?.id, previewTab]);
 
     const handleLogin = async () => {
-        if (!loginEmail.trim()) {
-            showToast("Masukkan email terlebih dahulu", "error");
-            return;
-        }
-        setLoginState('loading');
-        try {
-            const res = await fetch(GAS_AUTH_URL, {
-                method: 'POST',
-                mode: 'cors',
-                redirect: 'follow',
-                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                body: JSON.stringify({ action: 'login', email: loginEmail, deviceId: deviceId })
-            });
-            const data = await res.json();
-            if (data.success) {
+      if (!loginEmail.trim()) {
+          showToast("Masukkan email terlebih dahulu", "error");
+          return;
+      }
+      
+      setLoginState('loading');
+      
+      try {
+          const res = await fetch(GAS_AUTH_URL, {
+              method: 'POST',
+              mode: 'cors',
+              redirect: 'follow',
+              headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+              body: JSON.stringify({ action: 'login', email: loginEmail, deviceId: deviceId })
+          });
+          
+          const data = await res.json();
+          
+          if (data.success) {
               setLoginState('success');
               showToast("Selamat Datang Kembali", "success");
               
@@ -253,24 +257,29 @@ export default function App() {
               // Transisi instan ke main app tanpa delay
               setIsAuthenticated(true);
               loadInitialData();
-                
-            } else {
-                setLoginState('failed');
-                if (data.message === "Max Device Terpakai") {
-                    showToast("Max Device Terpakai", "error");
-                } else if (data.message === "Email Tidak Terdaftar") {
-                    showToast("Email Tidak Terdaftar", "error");
-                } else {
-                    showToast(data.message || "Gagal Login", "error");
-                }
-                setTimeout(() => setLoginState('idle'), 1500);
-            }
-        } catch (err) {
-            setLoginState('failed');
-            showToast("Koneksi gagal. Cek internet atau URL Satpam.", "error");
-            setTimeout(() => setLoginState('idle'), 1500);
-        }
-    };
+              
+          } else {
+              setLoginState('failed');
+              // Tampilkan pesan error dari GAS
+              if (data.message === "Max Device Terpakai") {
+                  showToast("Max Device Terpakai", "error");
+              } else if (data.message === "Email Tidak Terdaftar") {
+                  showToast("Email Tidak Terdaftar", "error");
+              } else {
+                  showToast(data.message || "Gagal Login", "error");
+              }
+              
+              setTimeout(() => setLoginState('idle'), 1500);
+          }
+          
+      } catch (err) {
+          console.error("Auth error:", err);
+          setLoginState('failed');
+          showToast("Koneksi gagal. Cek internet atau URL Satpam.", "error");
+          setTimeout(() => setLoginState('idle'), 1500);
+      }
+  };
+
 
     const handleLogout = () => {
         fetch(GAS_AUTH_URL, {
