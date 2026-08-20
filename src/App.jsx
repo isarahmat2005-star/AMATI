@@ -1157,15 +1157,6 @@ FOKUS UTAMA: Output HARUS dalam format JSON murni dengan struktur array "bluepri
                         
                         <div className="flex-1 flex flex-col overflow-y-visible lg:overflow-y-auto overflow-x-hidden custom-scroll">
                             <div className="p-4 flex flex-col gap-4">
-                                
-                                <div className="flex gap-2 w-full">
-                                    <a href="https://lynk.id/isaproject" target="_blank" rel="noreferrer" className="flex-1 flex items-center justify-center gap-2 bg-slate-800 hover:bg-slate-900 text-white font-semibold py-3 rounded-lg transition shadow-sm text-[11px] tracking-wide hover:-translate-y-0.5 duration-200">
-                                        <BriefcaseIcon /> My Project
-                                    </a>
-                                    <a href="https://lynk.id/isaproject/0581ez0729vx" target="_blank" rel="noreferrer" className="flex-1 flex items-center justify-center gap-2 bg-[#0891B3] hover:bg-[#06738F] text-white font-semibold py-3 rounded-lg transition shadow-sm text-[11px] tracking-wide hover:-translate-y-0.5 duration-200">
-                                        <CoffeeIcon /> Support
-                                    </a>
-                                </div>
 
                                 {/* ACTIVE USER PANEL */}
                                 <div className="flex items-center justify-between p-3 bg-white border border-[#0891B3]/30 rounded-lg shadow-sm">
