@@ -1098,9 +1098,9 @@ FOKUS UTAMA: Output HARUS dalam format JSON murni dengan struktur array "bluepri
 
     if (!isAuthenticated) {
         return (
-            <div className="fixed inset-0 flex items-center justify-center bg-slate-100 overflow-hidden" style={{ fontFamily: "'Share Tech', sans-serif", backgroundImage: 'linear-gradient(rgba(8, 145, 179, 0.08) 1px, transparent 1px), linear-gradient(90deg, rgba(8, 145, 179, 0.08) 1px, transparent 1px)', backgroundSize: '20px 20px' }}>
+            <div className="fixed inset-0 flex items-center justify-center bg-slate-100 overflow-hidden" style={{ fontFamily: "'Share Tech', sans-serif", backgroundImage: 'linear-gradient(rgba(59, 130, 246, 0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(59, 130, 246, 0.05) 1px, transparent 1px)', backgroundSize: '20px 20px' }}>
                 
-                {/* GLOBAL TOAST NOTIFICATION LOGIN */}
+                {/* GLOBAL TOAST NOTIFICATION (Posisi di kanan atas saat login) */}
                 <div className={`fixed top-4 right-4 z-[9999] transition-all duration-500 transform ${toast.show ? 'translate-y-0 opacity-100' : '-translate-y-full opacity-0'}`}>
                     <div className={`px-4 py-3 rounded-lg shadow-lg flex items-center gap-3 border ${toast.type === 'error' ? 'bg-red-50 border-red-200 text-red-700' : 'bg-emerald-50 border-emerald-200 text-emerald-700'}`}>
                         {toast.type === 'error' ? <AlertTriangleIcon className="w-5 h-5"/> : <CheckCircleIcon className="w-5 h-5"/>}
@@ -1109,12 +1109,9 @@ FOKUS UTAMA: Output HARUS dalam format JSON murni dengan struktur array "bluepri
                 </div>
 
                 <div className={`flex flex-col items-center justify-center w-full max-w-sm px-4 z-10 transition-all duration-500 ${loginState === 'success' ? 'opacity-0 scale-110' : 'opacity-100 scale-100'}`}>
-                    <div className="w-full bg-white p-6 rounded-lg border border-[#0891B3]/30 shadow-md flex flex-col gap-4 relative z-10">
-                        <div className="text-center mb-2">
-                            <h1 className="text-2xl font-bold text-[#0891B3] tracking-widest">AMATI LOGIN</h1>
-                        </div>
-                        <input type="email" value={loginEmail} onChange={e => setLoginEmail(e.target.value)} onKeyDown={e => e.key === 'Enter' && handleLogin()} className="w-full p-3 rounded-lg bg-white border border-slate-300 text-slate-800 font-bold text-center outline-none transition-all h-12 focus:ring-2 focus:ring-[#0891B3] focus:border-[#0891B3] disabled:opacity-50 disabled:bg-slate-100" placeholder="MASUKKAN EMAIL" disabled={loginState === 'loading' || loginState === 'success'} />
-                        <button onClick={handleLogin} disabled={loginState === 'loading' || loginState === 'success'} className="bg-[#0891B3] hover:bg-[#06738F] text-white p-3 text-base font-bold rounded-lg cursor-pointer shadow-sm transition disabled:opacity-50">
+                    <div className="w-full bg-white p-6 rounded-lg border border-blue-200 shadow-md flex flex-col gap-4 relative z-10">
+                        <input type="email" value={loginEmail} onChange={e => setLoginEmail(e.target.value)} onKeyDown={e => e.key === 'Enter' && handleLogin()} className="w-full p-3 rounded-lg bg-white border border-slate-300 text-slate-800 font-bold text-center outline-none transition-all h-12 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:opacity-50 disabled:bg-slate-100" placeholder="MASUKKAN EMAIL" disabled={loginState === 'loading' || loginState === 'success'} />
+                        <button onClick={handleLogin} disabled={loginState === 'loading' || loginState === 'success'} className="bg-blue-600 hover:bg-blue-700 text-white p-3 text-base font-bold rounded-lg cursor-pointer shadow-sm transition disabled:opacity-50">
                             {loginState === 'loading' ? 'MEMPROSES...' : 'LOGIN'}
                         </button>
                     </div>
@@ -1122,6 +1119,7 @@ FOKUS UTAMA: Output HARUS dalam format JSON murni dengan struktur array "bluepri
             </div>
         );
     }
+    
     return (
         <>
             <style>{`
