@@ -1285,7 +1285,7 @@ FOKUS UTAMA: Output HARUS dalam format JSON murni dengan struktur array "bluepri
                         </div>
                         <input type="email" value={loginEmail} onChange={e => setLoginEmail(e.target.value)} onKeyDown={e => e.key === 'Enter' && handleLogin()} className="w-full p-3 rounded-lg bg-white border border-slate-300 text-slate-800 font-bold text-center outline-none transition-all h-12 focus:ring-2 focus:ring-[#0891B3] focus:border-[#0891B3] disabled:opacity-50 disabled:bg-slate-100" placeholder="MASUKKAN EMAIL" disabled={loginState === 'loading' || loginState === 'success'} />
                         <button onClick={handleLogin} disabled={loginState === 'loading' || loginState === 'success'} className="bg-[#0891B3] hover:bg-[#06738F] text-white p-3 text-base font-bold rounded-lg cursor-pointer shadow-sm transition disabled:opacity-50">
-                            {loginState === 'loading' ? 'MEMPROSES...' : 'LOGIN'}
+                            {loginState === 'loading' ? <>MEMPROSES<span className="dot-anim inline-block w-3 text-left"></span></> : 'LOGIN'}
                         </button>
                     </div>
                 </div>
@@ -1741,7 +1741,7 @@ FOKUS UTAMA: Output HARUS dalam format JSON murni dengan struktur array "bluepri
                                     {isTabGenerating || isTabPaused || isTabProcessing ? (
                                         <div className={`flex-1 border text-xs font-bold rounded-lg flex items-center justify-center gap-2 shadow-sm select-none transition-all ${isTabPaused ? 'bg-amber-50 text-amber-700 border-amber-200' : 'bg-[#0891B3]/10 text-[#0891B3] border-[#0891B3]/30'}`}>
                                             <SparklesIcon className={`w-4 h-4 ${isTabPaused ? '' : 'animate-spin'} ${isTabPaused ? 'text-amber-600' : 'text-[#0891B3]'}`} />
-                                            <span className="uppercase tracking-wide">{isTabPaused ? 'Terhenti' : 'Memproses...'}</span>
+                                            <span className="uppercase tracking-wide">{isTabPaused ? 'Terhenti' : <>Memproses<span className="dot-anim inline-block w-3 text-left"></span></>}</span>
                                         </div>
                                     ) : (
                                         <button onClick={() => handleStartAction(false)} disabled={!canGenerate || isProcessMismatch} className={`flex-1 text-xs font-bold rounded-lg border shadow transition-colors flex items-center justify-center gap-2 uppercase tracking-wide truncate ${canGenerate && !isProcessMismatch ? 'bg-[#0891B3] hover:bg-[#06738F] text-white border-[#06738F] hover:-translate-y-0.5' : 'bg-slate-100 border-slate-200 cursor-not-allowed text-slate-400'}`}>
