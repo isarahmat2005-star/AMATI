@@ -780,7 +780,7 @@ FOKUS UTAMA: Output HARUS dalam format JSON murni dengan struktur array "bluepri
         const isSequential = finalPrompt.toLowerCase().includes("sequential") || finalPrompt.toLowerCase().includes("phase 1");
         
         let dynamicSystemLayer3 = SYSTEM_LAYER_3;
-        if (task.media) dynamicSystemLayer3 += `\n- ATURAN TRACING GAMBAR (MUTLAK): JIPLAK gambar referensi jadi elemen SVG murni menggunakan JS create(). ANIMASIKAN hasil jiplakan tersebut di update() menjadi motion graphic.`;
+        if (task.media) dynamicSystemLayer3 += `\n- ATURAN TRACING GAMBAR (MUTLAK): JIPLAK gambar referensi jadi elemen SVG murni menggunakan JS create(). ANIMASIKAN hasil jiplakan tersebut di update() menjadi motion graphic.\n- EKSTRAKSI WARNA BACKGROUND (WAJIB): Gunakan warna dominan gambar referensi sebagai background solid bersih, JANGAN jiplak background asli secara literal jika kompleks atau berisi noise.\n- DETEKSI TEKS (WAJIB JIKA ADA): Jika ada teks di gambar referensi, rekonstruksi ulang menggunakan elemen <text> SVG, JANGAN pernah dijiplak sebagai path vektor agar teks tetap rapi dan terbaca.\n- FOKUS OBJEK UTAMA (WAJIB): Jiplak & animasikan HANYA subjek/objek utama, abaikan dan buang elemen latar yang tidak relevan (seperti foto asli, watermark, atau tekstur pengganggu).`;
         if (isLineDrawing) dynamicSystemLayer3 += `\n- Aturan Line Drawing: Gunakan pathLength="100" dan animasikan atribut stroke-dashoffset di fungsi update. DILARANG fill warna.`;
         if (isSequential) dynamicSystemLayer3 += `\n- Aturan Berantai: Gunakan matematika percabangan pada waktu \`t\` untuk membagi gerakan elemen (misal: if t < 3 { animasi A } else { animasi B }). Gerakan tidak serentak.`;
 
