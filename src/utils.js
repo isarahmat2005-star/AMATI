@@ -59,6 +59,10 @@ export const wrapSvgAsHtml = (jsCode, resolution = '1920x1080', duration = 10, v
     const isPreview = viewMode === 'preview';
     const [w, h] = resolution.split('x');
 
+    // Menarik detik thumbnail spesifik dari meta-tag di dalam JS Code
+    const metaThumbMatch = jsCode.match(/THUMB:(\d+(?:\.\d+)?)/i);
+    const thumbTime = metaThumbMatch ? parseFloat(metaThumbMatch[1]) : (duration * 0.40);
+
     const playerStyles = isPreview ? `
     .player-bar { height: 44px; background: #ffffff; border: 1px solid #0891B3; border-radius: 8px; padding: 0 16px; display: flex; align-items: center; gap: 12px; margin-top: 12px; flex-shrink: 0; }
     .play-btn { background: #0891B3; color: white; border: none; border-radius: 50%; width: 24px; height: 24px; cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 0; transition: background 0.2s; }
@@ -139,7 +143,8 @@ export const wrapSvgAsHtml = (jsCode, resolution = '1920x1080', duration = 10, v
             };
             requestAnimationFrame(_render);
 
-            if (typeof update === 'function' && !_isPlaying) update(_dur * 0.3, _svg, _w, _h);
+            // Menerapkan detik thumbnail spesifik saat membeku (isThumb === true)
+            if (typeof update === 'function' && !_isPlaying) update(${thumbTime}, _svg, _w, _h);
 
             if (_btn && _track) {
                 _btn.addEventListener('click', () => {
