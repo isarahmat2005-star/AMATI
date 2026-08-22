@@ -7,7 +7,7 @@ import { R, getOpfsDir, saveToOpfs, getFromOpfs, deleteFromOpfs, fileToBase64, h
 // === KONFIGURASI GOOGLE APPS SCRIPT (SATPAM LOGIN) ===
 // Anda dapat mengedit URL Deployment Web App di bawah ini.
 // =====================================================================
-const GAS_AUTH_URL = "https://script.google.com/macros/s/AKfycbxkoD96dcvAmMs7X-yK_3N7W2aNlE4kdd6R3HHVm3BFxOCRQ7yFnILsdE2Pe3uKGI65Gw/exec";
+const GAS_AUTH_URL = "https://script.google.com/macros/s/AKfycbxXFERsHCf2T7yzNMRk3NdbS_QFa7qIHHwCPROlR1k9q8J5YPeqFfKKMZkrFbxZiMRv/exec";
 
 // --- INDEXED DB UNTUK DEVICE ID & AUTO-SAVE ---
 const META_STORE_NAME = 'meta_store';
