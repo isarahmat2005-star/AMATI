@@ -2102,9 +2102,9 @@ FOKUS UTAMA: Output HARUS dalam format JSON murni dengan struktur array "bluepri
 
                                                         {/* BAGIAN THUMBNAIL (PROPORSIONAL + SLIDER DESAIN PLAYER BAR) */}
                                                         <h3 className="text-[10px] font-bold text-slate-500 mb-3 uppercase tracking-widest border-b border-slate-200 pb-2">Pemilihan Thumbnail</h3>
-                                                        <div className="flex flex-col gap-4 bg-white p-4 border border-slate-200 rounded-lg shadow-sm mb-4">
+                                                        <div className="flex flex-col gap-3 bg-white p-3 border border-slate-200 rounded-lg shadow-sm mb-4">
                                                             
-                                                            {/* Live Preview Iframe (Menggunakan teknik Aspect Ratio persis seperti tab Preview) */}
+                                                            {/* Live Preview Iframe */}
                                                             <div className="w-full max-w-[320px] mx-auto">
                                                                 <div className="w-full relative bg-slate-100 rounded-lg overflow-hidden shadow-inner border border-slate-300" style={{ paddingBottom: `calc(${1 / aspect * 100}%)` }}>
                                                                     <iframe srcDoc={wrapSvgAsHtml(editCode, resStr, editCard?.duration || 10, 'thumbnail')} className="absolute inset-0 w-full h-full border-none pointer-events-none" sandbox="allow-scripts" scrolling="no" />
@@ -2119,18 +2119,12 @@ FOKUS UTAMA: Output HARUS dalam format JSON murni dengan struktur array "bluepri
                                                                 const thumbPercent = Math.min(100, Math.max(0, (thumbVal / currentDur) * 100));
 
                                                                 return (
-                                                                    <div className="w-full max-w-[320px] mx-auto h-[44px] bg-white border border-[#0891B3] rounded-lg px-4 flex items-center gap-3 shrink-0 shadow-sm relative z-10 box-border mt-2">
+                                                                    <div className="w-full max-w-[320px] mx-auto h-[44px] bg-white border border-[#0891B3] rounded-lg px-4 flex items-center gap-3 shrink-0 shadow-sm relative z-10 box-border">
                                                                         
                                                                         {/* Garis Track & Slider */}
                                                                         <div className="flex-1 h-[6px] bg-slate-200 rounded-full relative flex items-center">
-                                                                            
-                                                                            {/* Warna Fill Biru (Progres) */}
                                                                             <div className="absolute top-0 left-0 h-full bg-[#0891B3] rounded-full pointer-events-none" style={{ width: `${thumbPercent}%` }}></div>
-                                                                            
-                                                                            {/* Bulatan Thumb Putih-Biru */}
                                                                             <div className="absolute top-1/2 -translate-y-1/2 w-3 h-3 bg-white border-2 border-[#0891B3] rounded-full shadow-[0_1px_3px_rgba(0,0,0,0.3)] pointer-events-none" style={{ left: `calc(${thumbPercent}% - 6px)` }}></div>
-                                                                            
-                                                                            {/* Input Range Asli (Dibuat Transparan / Tidak Terlihat di atas track) */}
                                                                             <input type="range" min="0" max={currentDur} step="0.1" 
                                                                                 value={thumbVal} 
                                                                                 onChange={e => handleSettingsChange('thumb', parseFloat(e.target.value))} 
