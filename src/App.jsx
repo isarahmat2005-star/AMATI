@@ -2090,7 +2090,7 @@ FOKUS UTAMA: Output HARUS dalam format JSON murni dengan struktur array "bluepri
                                                         {/* --- SECTION: EKSTRAKSI WARNA --- */}
                                                         <div>
                                                             <h3 className="text-[10px] font-bold text-slate-500 mb-3 uppercase tracking-widest border-b border-slate-200 pb-2">Ekstraksi Warna</h3>
-                                                            <div className="flex flex-wrap gap-3 p-3 bg-white border border-slate-200 rounded-lg shadow-sm">
+                                                            <div className="flex flex-wrap gap-3 p-3 bg-white border border-slate-200 rounded-lg shadow-sm mb-3">
                                                                 {Array.from(new Set(editCode.match(/#[0-9a-fA-F]{3,8}\b/g) || [])).map(c => (
                                                                     <CustomColorWheel key={c} color={c.substring(0,7)} onChange={(newColor) => handleSettingsChange('color', { old: c, new: newColor })} />
                                                                 ))}
@@ -2114,7 +2114,7 @@ FOKUS UTAMA: Output HARUS dalam format JSON murni dengan struktur array "bluepri
                                                                 {(() => {
                                                                     const currentDur = editCard?.duration || 10;
                                                                     const thumbMatch = editCode.match(/THUMB:(\d+(?:\.\d+)?)/i);
-                                                                    const thumbVal = thumbMatch ? parseFloat(thumbMatch[1]) : (currentDur * 0.39);
+                                                                    const thumbVal = thumbMatch ? parseFloat(thumbMatch[1]) : (currentDur * 0.40);
                                                                     const thumbPercent = Math.min(100, Math.max(0, (thumbVal / currentDur) * 100));
 
                                                                     return (
