@@ -838,9 +838,24 @@ FOKUS UTAMA: Output HARUS dalam format JSON murni dengan struktur array "bluepri
             newCode = newCode.replace(regex, value.new);
         } else if (type === 'text') {
             if (oldMatch) {
-                newCode = newCode.replace(oldMatch.full, `.${oldMatch.prop} = ${oldMatch.quote}${value}${oldMatch.quote}`);
+                if (oldMatch.quote === '>') {
+                    // Replace teks di dalam tag XML/SVG
+                    const newTag = oldMatch.full.replace(new RegExp(`>\\s*${oldMatch.text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\s*<`), `>${value}<`);
+                    newCode = newCode.replace(oldMatch.full, newTag);
+                } else {
+                    // Replace teks di properti JS biasa (mendukung backticks `` ` ``)
+                    newCode = newCode.replace(oldMatch.full, `.${oldMatch.prop} = ${oldMatch.quote}${value}${oldMatch.quote}`);
+                }
+            }
+        } else if (type === 'thumb') {
+            // Logika baru untuk mengubah meta-tag THUMB
+            if (/\/\/\s*\[META\].*THUMB:/i.test(newCode)) {
+                newCode = newCode.replace(/THUMB:(\d+(?:\.\d+)?)/i, `THUMB:${value}`);
+            } else if (/\/\/\s*\[META\]/i.test(newCode)) {
+                newCode = newCode.replace(/\/\/\s*\[META\](.*)/i, `// [META]$1 THUMB:${value}`);
             }
         } else {
+            // Logika untuk rasio, resolusi, dan durasi tetap utuh
             let currentRes = editCard?.resolution || '1920x1080';
             let currentDur = editCard?.duration || 10;
             let currentRatio = editRatio;
@@ -854,7 +869,10 @@ FOKUS UTAMA: Output HARUS dalam format JSON murni dengan struktur array "bluepri
             if (type === 'duration') currentDur = value;
 
             if (/\/\/\s*\[META\]\s*RES:(\d+x\d+)\s*DUR:(\d+)/i.test(newCode)) {
-                newCode = newCode.replace(/\/\/\s*\[META\].*/i, `// [META] RES:${currentRes} DUR:${currentDur}`);
+                // Pertahankan properti THUMB jika sebelumnya ada
+                const oldThumbMatch = newCode.match(/THUMB:(\d+(?:\.\d+)?)/i);
+                const thumbString = oldThumbMatch ? ` THUMB:${oldThumbMatch[1]}` : '';
+                newCode = newCode.replace(/\/\/\s*\[META\].*/i, `// [META] RES:${currentRes} DUR:${currentDur}${thumbString}`);
             } else {
                 newCode = `// [META] RES:${currentRes} DUR:${currentDur}\n` + newCode;
             }
@@ -985,20 +1003,28 @@ FOKUS UTAMA: Output HARUS dalam format JSON murni dengan struktur array "bluepri
                         
                         setCards(prev => prev.map(f => f.id === task.id ? { ...f, status: 'processing', renderProgress: { frame: 0, total: task.duration * renderFps }, fps: renderFps } : f));
                         try {
-                            const randomHFId = generateRandomTaskID();
-                            
-                            // 1. TAHAP 1: START RENDER
-                            const startRes = await fetch(`${workerUrl.replace(/\/$/, '')}/start-render`, {
-                                method: 'POST', headers: { 'Content-Type': 'application/json', 'Bypass-Tunnel-Reminder': 'true' },
-                                body: JSON.stringify({ data: [task.code, task.resolution.toLowerCase(), task.duration, renderFps, randomHFId, renderBitrate] })
-                            });
-                            
-                            if (!startRes.ok) throw new Error(`Start Error: ${startRes.status}`);
-                            const startData = await startRes.json();
-                            const jobId = startData.job_id;
-                            if (!jobId) throw new Error("Gagal mendapatkan job_id dari server.");
+                            // --- KODE BARU LOGIKA PAUSE RESUME ---
+                            let jobId = task.jobId || null;
+                            let activeWorkerUrl = task.workerUrl || workerUrl;
 
-                            // 2. TAHAP 2: POLLING STATUS DENGAN KOREKSI CLAUDE
+                            // TAHAP 1: START RENDER (Hanya jika belum punya Job ID)
+                            if (!jobId) {
+                                const randomHFId = generateRandomTaskID();
+                                const startRes = await fetch(`${activeWorkerUrl.replace(/\/$/, '')}/start-render`, {
+                                    method: 'POST', headers: { 'Content-Type': 'application/json', 'Bypass-Tunnel-Reminder': 'true' },
+                                    body: JSON.stringify({ data: [task.code, task.resolution.toLowerCase(), task.duration, renderFps, randomHFId, renderBitrate] })
+                                });
+                                
+                                if (!startRes.ok) throw new Error(`Start Error: ${startRes.status}`);
+                                const startData = await startRes.json();
+                                jobId = startData.job_id;
+                                if (!jobId) throw new Error("Gagal mendapatkan job_id dari server.");
+                                
+                                // Simpan jobId dan worker ke state kartu agar aman walau dipause
+                                setCards(prev => prev.map(c => c.id === task.id ? { ...c, jobId, workerUrl: activeWorkerUrl } : c));
+                            }
+
+                            // TAHAP 2: POLLING STATUS
                             let isDone = false;
                             let lastFrame = -1;
                             let lastProgressTime = Date.now();
@@ -1010,10 +1036,10 @@ FOKUS UTAMA: Output HARUS dalam format JSON murni dengan struktur array "bluepri
                                 
                                 let statusData = null;
                                 try {
-                                    const statusRes = await fetch(`${workerUrl.replace(/\/$/, '')}/status/${jobId}`, { headers: { 'Bypass-Tunnel-Reminder': 'true' } });
+                                    const statusRes = await fetch(`${activeWorkerUrl.replace(/\/$/, '')}/status/${jobId}`, { headers: { 'Bypass-Tunnel-Reminder': 'true' } });
                                     if (!statusRes.ok) {
                                         consecutiveMisses++;
-                                        if (consecutiveMisses > 20) throw new Error("Job hilang dari server (mungkin server restart).");
+                                        if (consecutiveMisses > 20) throw new Error("Job hilang dari server.");
                                         continue;
                                     }
                                     consecutiveMisses = 0;
@@ -1039,7 +1065,7 @@ FOKUS UTAMA: Output HARUS dalam format JSON murni dengan struktur array "bluepri
                                         throw new Error("Timeout: Render macet lebih dari 3 menit.");
                                     }
                                 } else if (Date.now() - lastProgressTime > timeoutMs) {
-                                    throw new Error("Timeout: Macet di antrean (queued) lebih dari 3 menit.");
+                                    throw new Error("Timeout: Macet di antrean lebih dari 3 menit.");
                                 }
                             }
 
@@ -1048,8 +1074,8 @@ FOKUS UTAMA: Output HARUS dalam format JSON murni dengan struktur array "bluepri
                                 break;
                             }
 
-                            // 3. TAHAP 3: AMBIL HASIL & SIMPAN KE OPFS
-                            const resultRes = await fetch(`${workerUrl.replace(/\/$/, '')}/result/${jobId}`, { headers: { 'Bypass-Tunnel-Reminder': 'true' } });
+                            // TAHAP 3: AMBIL HASIL
+                            const resultRes = await fetch(`${activeWorkerUrl.replace(/\/$/, '')}/result/${jobId}`, { headers: { 'Bypass-Tunnel-Reminder': 'true' } });
                             if (!resultRes.ok) throw new Error(`Result Error: ${resultRes.status}`);
                             const resultData = await resultRes.json();
                             
@@ -1065,14 +1091,14 @@ FOKUS UTAMA: Output HARUS dalam format JSON murni dengan struktur array "bluepri
                                 if (renderExportType === 'base64') {
                                     await saveToOpfs('base64', task.id, b64Data);
                                 }
-
                                 setCards(prev => prev.map(c => c.id === task.id ? { ...c, status: 'done', hasFile: true, renderProgress: null } : c));
                             } else { 
                                 throw new Error("Format balasan Base64 kosong dari server."); 
                             }
 
                         } catch (error) { 
-                            setCards(prev => prev.map(f => f.id === task.id ? { ...f, status: 'failed', error: error.message, renderProgress: null } : f)); 
+                            // Jika error total, hapus jobId agar mulai merender ulang dari 0 saat di-resume
+                            setCards(prev => prev.map(f => f.id === task.id ? { ...f, status: 'failed', error: error.message, renderProgress: null, jobId: null } : f)); 
                         }
                     }
                 });
@@ -1977,10 +2003,17 @@ FOKUS UTAMA: Output HARUS dalam format JSON murni dengan struktur array "bluepri
                     const dynamicVh = aspect < 1 ? '95vh' : '85vh';
                     
                     const textMatches = [];
-                    const textRegex = /\.(textContent|innerHTML)\s*=\s*(["'])(.*?)\2/g;
+                    // 1. Menangkap teks dari .textContent atau .innerHTML (support ' " dan ` )
+                    const textRegex = /\.(textContent|innerHTML)\s*=\s*(["'`])(.*?)\2/g;
                     let match;
                     while ((match = textRegex.exec(editCode)) !== null) {
                         if (match[3].trim() !== "") textMatches.push({ full: match[0], prop: match[1], quote: match[2], text: match[3] });
+                    }
+                    
+                    // 2. Menangkap teks yang ada di dalam tag <text> atau <tspan> SVG
+                    const svgTextRegex = /<(text|tspan)[^>]*>(.*?)<\/\1>/g;
+                    while ((match = svgTextRegex.exec(editCode)) !== null) {
+                        if (match[2].trim() !== "") textMatches.push({ full: match[0], prop: match[1], quote: '>', text: match[2] });
                     }
                     
                     return (
@@ -2033,6 +2066,19 @@ FOKUS UTAMA: Output HARUS dalam format JSON murni dengan struktur array "bluepri
                                                                 <select value={editCard?.duration || 10} onChange={e => handleSettingsChange('duration', parseInt(e.target.value))} className="w-full text-xs py-2 px-2 border border-slate-300 rounded bg-white text-slate-700 focus:ring-2 focus:ring-[#0891B3] outline-none shadow-sm">
                                                                     {DURATIONS.map(d => <option key={d} value={d}>{d} Detik</option>)}
                                                                 </select>
+                                                            </div>
+                                                            <div className="col-span-3 mt-1 pt-3 border-t border-slate-200">
+                                                                <label className="block text-[10px] font-bold text-[#0891B3] mb-2 uppercase tracking-widest">Atur Detik Thumbnail (Bebas Geser)</label>
+                                                                <div className="flex items-center gap-3">
+                                                                    <input type="range" min="0" max={editCard?.duration || 10} step="0.1" 
+                                                                        value={editCode.match(/THUMB:(\d+(?:\.\d+)?)/i)?.[1] || ((editCard?.duration || 10) * 0.39)} 
+                                                                        onChange={e => handleSettingsChange('thumb', parseFloat(e.target.value))} 
+                                                                        className="flex-1 cursor-pointer accent-[#0891B3] h-2 bg-slate-200 rounded-lg appearance-none" 
+                                                                    />
+                                                                    <span className="text-[12px] font-bold text-slate-700 w-10 text-right tabular-nums bg-white border border-slate-200 px-1 py-0.5 rounded shadow-sm">
+                                                                        {parseFloat(editCode.match(/THUMB:(\d+(?:\.\d+)?)/i)?.[1] || ((editCard?.duration || 10) * 0.39)).toFixed(1)}s
+                                                                    </span>
+                                                                </div>
                                                             </div>
                                                         </div>
 
