@@ -2100,46 +2100,48 @@ FOKUS UTAMA: Output HARUS dalam format JSON murni dengan struktur array "bluepri
                                                             </div>
                                                         </div>
 
-                                                        {/* BAGIAN THUMBNAIL (PROPORSIONAL + SLIDER DESAIN PLAYER BAR FULL WIDTH) */}
-                                                        <h3 className="text-[10px] font-bold text-slate-500 mb-3 uppercase tracking-widest border-b border-slate-200 pb-2">Pemilihan Thumbnail</h3>
-                                                        <div className="flex flex-wrap gap-3 p-3 bg-white border border-slate-200 rounded-lg shadow-sm">
-                                                            
-                                                            {/* Live Preview Iframe (Membentang Full) */}
-                                                            <div className="w-full relative bg-slate-100 rounded-lg overflow-hidden shadow-inner border border-slate-300" style={{ paddingBottom: `calc(${1 / aspect * 100}%)` }}>
-                                                                <iframe srcDoc={wrapSvgAsHtml(editCode, resStr, editCard?.duration || 10, 'thumbnail')} className="absolute inset-0 w-full h-full border-none pointer-events-none" sandbox="allow-scripts" scrolling="no" />
+                                                        {/* BAGIAN THUMBNAIL (STRUKTUR DIV DISAMAKAN DENGAN EKSTRAKSI WARNA) */}
+                                                        <div className="mt-5">
+                                                            <h3 className="text-[10px] font-bold text-slate-500 mb-3 uppercase tracking-widest border-b border-slate-200 pb-2">Pemilihan Thumbnail</h3>
+                                                            <div className="flex flex-col gap-3 p-3 bg-white border border-slate-200 rounded-lg shadow-sm">
+                                                                
+                                                                {/* Live Preview Iframe */}
+                                                                <div className="w-full relative bg-slate-100 rounded-lg overflow-hidden shadow-inner border border-slate-300" style={{ paddingBottom: `calc(${1 / aspect * 100}%)` }}>
+                                                                    <iframe srcDoc={wrapSvgAsHtml(editCode, resStr, editCard?.duration || 10, 'thumbnail')} className="absolute inset-0 w-full h-full border-none pointer-events-none" sandbox="allow-scripts" scrolling="no" />
+                                                                </div>
+                                                                
+                                                                {/* Slider ala Player Bar (Tanpa Tombol Play) */}
+                                                                {(() => {
+                                                                    const currentDur = editCard?.duration || 10;
+                                                                    const thumbMatch = editCode.match(/THUMB:(\d+(?:\.\d+)?)/i);
+                                                                    const thumbVal = thumbMatch ? parseFloat(thumbMatch[1]) : (currentDur * 0.39);
+                                                                    const thumbPercent = Math.min(100, Math.max(0, (thumbVal / currentDur) * 100));
+
+                                                                    return (
+                                                                        <div className="w-full h-[44px] bg-white border border-[#0891B3] rounded-lg px-4 flex items-center gap-3 shrink-0 shadow-sm relative z-10 box-border">
+                                                                            
+                                                                            {/* Garis Track & Slider */}
+                                                                            <div className="flex-1 h-[6px] bg-slate-200 rounded-full relative flex items-center">
+                                                                                <div className="absolute top-0 left-0 h-full bg-[#0891B3] rounded-full pointer-events-none" style={{ width: `${thumbPercent}%` }}></div>
+                                                                                <div className="absolute top-1/2 -translate-y-1/2 w-3 h-3 bg-white border-2 border-[#0891B3] rounded-full shadow-[0_1px_3px_rgba(0,0,0,0.3)] pointer-events-none" style={{ left: `calc(${thumbPercent}% - 6px)` }}></div>
+                                                                                <input type="range" min="0" max={currentDur} step="0.1" 
+                                                                                    value={thumbVal} 
+                                                                                    onChange={e => handleSettingsChange('thumb', parseFloat(e.target.value))} 
+                                                                                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer m-0 z-10" 
+                                                                                />
+                                                                            </div>
+                                                                            
+                                                                            {/* Label Waktu di Kanan */}
+                                                                            <div className="text-[11px] font-bold text-slate-600 font-mono tabular-nums min-w-[38px] text-right shrink-0">
+                                                                                {thumbVal.toFixed(1)}s
+                                                                            </div>
+                                                                        </div>
+                                                                    );
+                                                                })()}
+
                                                             </div>
-                                                            
-                                                            {/* Slider ala Player Bar (Tanpa Tombol Play - Membentang Full) */}
-                                                            {(() => {
-                                                                const currentDur = editCard?.duration || 10;
-                                                                const thumbMatch = editCode.match(/THUMB:(\d+(?:\.\d+)?)/i);
-                                                                const thumbVal = thumbMatch ? parseFloat(thumbMatch[1]) : (currentDur * 0.40);
-                                                                const thumbPercent = Math.min(100, Math.max(0, (thumbVal / currentDur) * 100));
-
-                                                                return (
-                                                                    <div className="w-full h-[44px] bg-white border border-[#0891B3] rounded-lg px-4 flex items-center gap-3 shrink-0 shadow-sm relative z-10 box-border">
-                                                                        
-                                                                        {/* Garis Track & Slider */}
-                                                                        <div className="flex-1 h-[6px] bg-slate-200 rounded-full relative flex items-center">
-                                                                            <div className="absolute top-0 left-0 h-full bg-[#0891B3] rounded-full pointer-events-none" style={{ width: `${thumbPercent}%` }}></div>
-                                                                            <div className="absolute top-1/2 -translate-y-1/2 w-3 h-3 bg-white border-2 border-[#0891B3] rounded-full shadow-[0_1px_3px_rgba(0,0,0,0.3)] pointer-events-none" style={{ left: `calc(${thumbPercent}% - 6px)` }}></div>
-                                                                            <input type="range" min="0" max={currentDur} step="0.1" 
-                                                                                value={thumbVal} 
-                                                                                onChange={e => handleSettingsChange('thumb', parseFloat(e.target.value))} 
-                                                                                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer m-0 z-10" 
-                                                                            />
-                                                                        </div>
-                                                                        
-                                                                        {/* Label Waktu di Kanan */}
-                                                                        <div className="text-[11px] font-bold text-slate-600 font-mono tabular-nums min-w-[38px] text-right shrink-0">
-                                                                            {thumbVal.toFixed(1)}s
-                                                                        </div>
-                                                                    </div>
-                                                                );
-                                                            })()}
-
                                                         </div>
-                                                    </div>    
+                                                    </div>
                                                 ) : editTab === 'preview' ? (
                                                     <iframe srcDoc={wrapSvgAsHtml(editCode, resStr, editCard?.duration, 'preview')} className="w-full h-full border-none block" sandbox="allow-scripts" />
                                                 ) : (
