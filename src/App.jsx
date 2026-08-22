@@ -2043,49 +2043,40 @@ FOKUS UTAMA: Output HARUS dalam format JSON murni dengan struktur array "bluepri
                                                 {isRevising && <div className="absolute inset-0 z-20 bg-white/70 backdrop-blur-sm flex flex-col items-center justify-center rounded-lg"><CustomSpinner className="w-10 h-10 text-[#0891B3] mb-3" /><p className="text-sm font-bold text-slate-700 tracking-wider">AI sedang merevisi kode...</p></div>}
                                                 
                                                 {editTab === 'settings' ? (
-                                                    <div className="flex-1 w-full bg-slate-50 border border-[#cbd5e1] rounded-lg overflow-y-auto custom-scroll p-4 shadow-inner">
+                                                    <div className="flex-1 w-full bg-slate-50 border border-[#cbd5e1] rounded-lg overflow-y-auto custom-scroll p-4 shadow-inner flex flex-col gap-6">
                                                         
-                                                        <h3 className="text-[10px] font-bold text-slate-500 mb-3 uppercase tracking-widest border-b border-slate-200 pb-2">Pengaturan Dimensi & Waktu</h3>
-                                                        <div className="grid grid-cols-3 gap-3 mb-6">
-                                                            <div>
-                                                                <label className="block text-[10px] font-bold text-slate-600 mb-1">Rasio Kanvas</label>
-                                                                <select value={editRatio} onChange={e => handleSettingsChange('ratio', e.target.value)} className="w-full text-xs py-2 px-2 border border-slate-300 rounded bg-white text-slate-700 focus:ring-2 focus:ring-[#0891B3] outline-none shadow-sm">
-                                                                    {RATIOS.map(r => <option key={r} value={r}>{r}</option>)}
-                                                                </select>
-                                                            </div>
-                                                            <div>
-                                                                <label className="block text-[10px] font-bold text-slate-600 mb-1">Resolusi Render</label>
-                                                                <select value={resStr} onChange={e => handleSettingsChange('resolution', e.target.value)} className="w-full text-xs py-2 px-2 border border-slate-300 rounded bg-white text-slate-700 focus:ring-2 focus:ring-[#0891B3] outline-none shadow-sm">
-                                                                    {Object.values(DIMENSIONS[editRatio]).map(res => (
-                                                                        <option key={res} value={res}>{res}</option>
-                                                                    ))}
-                                                                </select>
-                                                            </div>
-                                                            <div>
-                                                                <label className="block text-[10px] font-bold text-slate-600 mb-1">Durasi Loop</label>
-                                                                <select value={editCard?.duration || 10} onChange={e => handleSettingsChange('duration', parseInt(e.target.value))} className="w-full text-xs py-2 px-2 border border-slate-300 rounded bg-white text-slate-700 focus:ring-2 focus:ring-[#0891B3] outline-none shadow-sm">
-                                                                    {DURATIONS.map(d => <option key={d} value={d}>{d} Detik</option>)}
-                                                                </select>
-                                                            </div>
-                                                            <div className="col-span-3 mt-1 pt-3 border-t border-slate-200">
-                                                                <label className="block text-[10px] font-bold text-[#0891B3] mb-2 uppercase tracking-widest">Atur Detik Thumbnail (Bebas Geser)</label>
-                                                                <div className="flex items-center gap-3">
-                                                                    <input type="range" min="0" max={editCard?.duration || 10} step="0.1" 
-                                                                        value={editCode.match(/THUMB:(\d+(?:\.\d+)?)/i)?.[1] || ((editCard?.duration || 10) * 0.39)} 
-                                                                        onChange={e => handleSettingsChange('thumb', parseFloat(e.target.value))} 
-                                                                        className="flex-1 cursor-pointer accent-[#0891B3] h-2 bg-slate-200 rounded-lg appearance-none" 
-                                                                    />
-                                                                    <span className="text-[12px] font-bold text-slate-700 w-10 text-right tabular-nums bg-white border border-slate-200 px-1 py-0.5 rounded shadow-sm">
-                                                                        {parseFloat(editCode.match(/THUMB:(\d+(?:\.\d+)?)/i)?.[1] || ((editCard?.duration || 10) * 0.39)).toFixed(1)}s
-                                                                    </span>
+                                                        {/* --- SECTION: DIMENSI & WAKTU --- */}
+                                                        <div>
+                                                            <h3 className="text-[10px] font-bold text-slate-500 mb-3 uppercase tracking-widest border-b border-slate-200 pb-2">Pengaturan Dimensi & Waktu</h3>
+                                                            <div className="grid grid-cols-3 gap-3">
+                                                                <div>
+                                                                    <label className="block text-[10px] font-bold text-slate-600 mb-1">Rasio Kanvas</label>
+                                                                    <select value={editRatio} onChange={e => handleSettingsChange('ratio', e.target.value)} className="w-full text-xs py-2 px-2 border border-slate-300 rounded bg-white text-slate-700 focus:ring-2 focus:ring-[#0891B3] outline-none shadow-sm">
+                                                                        {RATIOS.map(r => <option key={r} value={r}>{r}</option>)}
+                                                                    </select>
+                                                                </div>
+                                                                <div>
+                                                                    <label className="block text-[10px] font-bold text-slate-600 mb-1">Resolusi Render</label>
+                                                                    <select value={resStr} onChange={e => handleSettingsChange('resolution', e.target.value)} className="w-full text-xs py-2 px-2 border border-slate-300 rounded bg-white text-slate-700 focus:ring-2 focus:ring-[#0891B3] outline-none shadow-sm">
+                                                                        {Object.values(DIMENSIONS[editRatio]).map(res => (
+                                                                            <option key={res} value={res}>{res}</option>
+                                                                        ))}
+                                                                    </select>
+                                                                </div>
+                                                                <div>
+                                                                    <label className="block text-[10px] font-bold text-slate-600 mb-1">Durasi Loop</label>
+                                                                    <select value={editCard?.duration || 10} onChange={e => handleSettingsChange('duration', parseInt(e.target.value))} className="w-full text-xs py-2 px-2 border border-slate-300 rounded bg-white text-slate-700 focus:ring-2 focus:ring-[#0891B3] outline-none shadow-sm">
+                                                                        {DURATIONS.map(d => <option key={d} value={d}>{d} Detik</option>)}
+                                                                    </select>
                                                                 </div>
                                                             </div>
                                                         </div>
 
+                                                        {/* --- SECTION: EKSTRAKSI TEKS --- */}
                                                         {textMatches.length > 0 && (
-                                                            <>
-                                                                <h3 className="text-[10px] font-bold text-slate-500 mb-3 uppercase tracking-widest border-b border-slate-200 pb-2 mt-4">Ekstraksi Teks (Typografi)</h3>
-                                                                <div className="flex flex-col gap-2 mb-6 bg-white p-3 border border-slate-200 rounded-lg shadow-sm">
+                                                            <div>
+                                                                <h3 className="text-[10px] font-bold text-slate-500 mb-3 uppercase tracking-widest border-b border-slate-200 pb-2">Ekstraksi Teks (Typografi)</h3>
+                                                                <div className="flex flex-col gap-2 bg-white p-3 border border-slate-200 rounded-lg shadow-sm">
                                                                     {textMatches.map((m, idx) => (
                                                                         <div key={idx} className="flex flex-col gap-1">
                                                                             <label className="text-[9px] font-bold text-slate-400 font-mono">.{m.prop} =</label>
@@ -2093,18 +2084,47 @@ FOKUS UTAMA: Output HARUS dalam format JSON murni dengan struktur array "bluepri
                                                                         </div>
                                                                     ))}
                                                                 </div>
-                                                            </>
+                                                            </div>
                                                         )}
 
-                                                        <h3 className="text-[10px] font-bold text-slate-500 mb-3 uppercase tracking-widest border-b border-slate-200 pb-2">Ekstraksi Warna (Otomatis)</h3>
-                                                        <div className="flex flex-wrap gap-3 p-3 bg-white border border-slate-200 rounded-lg shadow-sm">
-                                                            {Array.from(new Set(editCode.match(/#[0-9a-fA-F]{3,8}\b/g) || [])).map(c => (
-                                                                <CustomColorWheel key={c} color={c.substring(0,7)} onChange={(newColor) => handleSettingsChange('color', { old: c, new: newColor })} />
-                                                            ))}
-                                                            {(editCode.match(/#[0-9a-fA-F]{3,8}\b/g) || []).length === 0 && (
-                                                                <span className="text-[10px] text-slate-400 italic">Tidak ada kode warna HEX ditemukan.</span>
-                                                            )}
+                                                        {/* --- SECTION: EKSTRAKSI WARNA --- */}
+                                                        <div>
+                                                            <h3 className="text-[10px] font-bold text-slate-500 mb-3 uppercase tracking-widest border-b border-slate-200 pb-2">Ekstraksi Warna (Otomatis)</h3>
+                                                            <div className="flex flex-wrap gap-3 p-3 bg-white border border-slate-200 rounded-lg shadow-sm">
+                                                                {Array.from(new Set(editCode.match(/#[0-9a-fA-F]{3,8}\b/g) || [])).map(c => (
+                                                                    <CustomColorWheel key={c} color={c.substring(0,7)} onChange={(newColor) => handleSettingsChange('color', { old: c, new: newColor })} />
+                                                                ))}
+                                                                {(editCode.match(/#[0-9a-fA-F]{3,8}\b/g) || []).length === 0 && (
+                                                                    <span className="text-[10px] text-slate-400 italic">Tidak ada kode warna HEX ditemukan.</span>
+                                                                )}
+                                                            </div>
                                                         </div>
+
+                                                        {/* --- SECTION: PEMILIHAN THUMBNAIL (PALING BAWAH) --- */}
+                                                        <div>
+                                                            <h3 className="text-[10px] font-bold text-slate-500 mb-3 uppercase tracking-widest border-b border-slate-200 pb-2">Pemilihan Thumbnail</h3>
+                                                            <div className="flex flex-col gap-3 bg-white p-4 border border-slate-200 rounded-lg shadow-sm">
+                                                                
+                                                                {/* Live Preview Iframe */}
+                                                                <div className="relative mx-auto bg-slate-100 rounded overflow-hidden shadow-inner border border-slate-300 flex items-center justify-center" style={{ height: '160px', width: `${160 * aspect}px`, maxWidth: '100%' }}>
+                                                                    <iframe srcDoc={wrapSvgAsHtml(editCode, resStr, editCard?.duration || 10, 'thumbnail')} className="absolute inset-0 w-full h-full border-none pointer-events-none" sandbox="allow-scripts" scrolling="no" />
+                                                                </div>
+                                                                
+                                                                {/* Slider & Waktu Centered */}
+                                                                <div className="flex flex-col items-center gap-2 mt-2 w-full max-w-[80%] mx-auto">
+                                                                    <span className="text-[12px] font-bold text-[#0891B3] bg-[#0891B3]/10 border border-[#0891B3]/30 px-4 py-1 rounded-full shadow-sm text-center tabular-nums">
+                                                                        {parseFloat(editCode.match(/THUMB:(\d+(?:\.\d+)?)/i)?.[1] || ((editCard?.duration || 10) * 0.40)).toFixed(1)}s
+                                                                    </span>
+                                                                    <input type="range" min="0" max={editCard?.duration || 10} step="0.1" 
+                                                                        value={editCode.match(/THUMB:(\d+(?:\.\d+)?)/i)?.[1] || ((editCard?.duration || 10) * 0.40)} 
+                                                                        onChange={e => handleSettingsChange('thumb', parseFloat(e.target.value))} 
+                                                                        className="w-full cursor-pointer accent-[#0891B3] h-2 bg-slate-200 rounded-lg appearance-none" 
+                                                                    />
+                                                                </div>
+
+                                                            </div>
+                                                        </div>
+
                                                     </div>
                                                 ) : editTab === 'preview' ? (
                                                     <iframe srcDoc={wrapSvgAsHtml(editCode, resStr, editCard?.duration, 'preview')} className="w-full h-full border-none block" sandbox="allow-scripts" />
