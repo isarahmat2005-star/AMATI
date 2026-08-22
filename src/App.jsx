@@ -2147,6 +2147,7 @@ FOKUS UTAMA: Output HARUS dalam format JSON murni dengan struktur array "bluepri
                                                             })()}
 
                                                         </div>
+                                                    </div>    
                                                 ) : editTab === 'preview' ? (
                                                     <iframe srcDoc={wrapSvgAsHtml(editCode, resStr, editCard?.duration, 'preview')} className="w-full h-full border-none block" sandbox="allow-scripts" />
                                                 ) : (
