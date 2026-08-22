@@ -2089,7 +2089,7 @@ FOKUS UTAMA: Output HARUS dalam format JSON murni dengan struktur array "bluepri
 
                                                         {/* --- SECTION: EKSTRAKSI WARNA --- */}
                                                         <div>
-                                                            <h3 className="text-[10px] font-bold text-slate-500 mb-3 uppercase tracking-widest border-b border-slate-200 pb-2">Ekstraksi Warna (Otomatis)</h3>
+                                                            <h3 className="text-[10px] font-bold text-slate-500 mb-3 uppercase tracking-widest border-b border-slate-200 pb-2">Ekstraksi Warna</h3>
                                                             <div className="flex flex-wrap gap-3 p-3 bg-white border border-slate-200 rounded-lg shadow-sm">
                                                                 {Array.from(new Set(editCode.match(/#[0-9a-fA-F]{3,8}\b/g) || [])).map(c => (
                                                                     <CustomColorWheel key={c} color={c.substring(0,7)} onChange={(newColor) => handleSettingsChange('color', { old: c, new: newColor })} />
@@ -2102,7 +2102,7 @@ FOKUS UTAMA: Output HARUS dalam format JSON murni dengan struktur array "bluepri
 
                                                         {/* BAGIAN THUMBNAIL (PROPORSIONAL + SLIDER DESAIN PLAYER BAR FULL WIDTH) */}
                                                         <h3 className="text-[10px] font-bold text-slate-500 mb-3 uppercase tracking-widest border-b border-slate-200 pb-2">Pemilihan Thumbnail</h3>
-                                                        <div className="flex flex-col gap-3 bg-white p-3 border border-slate-200 rounded-lg shadow-sm mb-4">
+                                                        <div className="flex flex-wrap gap-3 p-3 bg-white border border-slate-200 rounded-lg shadow-sm">
                                                             
                                                             {/* Live Preview Iframe (Membentang Full) */}
                                                             <div className="w-full relative bg-slate-100 rounded-lg overflow-hidden shadow-inner border border-slate-300" style={{ paddingBottom: `calc(${1 / aspect * 100}%)` }}>
