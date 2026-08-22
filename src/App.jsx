@@ -2001,21 +2001,7 @@ FOKUS UTAMA: Output HARUS dalam format JSON murni dengan struktur array "bluepri
                     const resH = parts[1] || 1080;
                     const aspect = (resW && resH) ? (resW / resH) : 16/9;
                     const dynamicVh = aspect < 1 ? '95vh' : '85vh';
-                    
-                    const textMatches = [];
-                    // 1. Menangkap teks dari .textContent atau .innerHTML (support ' " dan ` )
-                    const textRegex = /\.(textContent|innerHTML)\s*=\s*(["'`])(.*?)\2/g;
-                    let match;
-                    while ((match = textRegex.exec(editCode)) !== null) {
-                        if (match[3].trim() !== "") textMatches.push({ full: match[0], prop: match[1], quote: match[2], text: match[3] });
-                    }
-                    
-                    // 2. Menangkap teks yang ada di dalam tag <text> atau <tspan> SVG
-                    const svgTextRegex = /<(text|tspan)[^>]*>(.*?)<\/\1>/g;
-                    while ((match = svgTextRegex.exec(editCode)) !== null) {
-                        if (match[2].trim() !== "") textMatches.push({ full: match[0], prop: match[1], quote: '>', text: match[2] });
-                    }
-                    
+            
                     return (
                         <div className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-slate-900/80 p-2 sm:p-4 md:p-8 backdrop-blur-sm transition-opacity" onClick={() => !isRevising && setEditCardId(null)}>
                             <div className="relative flex flex-col w-full mx-auto transition-all duration-300" style={{ maxWidth: `min(100%, calc((${dynamicVh} - 150px) * ${aspect}))` }} onClick={e => e.stopPropagation()}>
@@ -2043,7 +2029,7 @@ FOKUS UTAMA: Output HARUS dalam format JSON murni dengan struktur array "bluepri
                                                 {isRevising && <div className="absolute inset-0 z-20 bg-white/70 backdrop-blur-sm flex flex-col items-center justify-center rounded-lg"><CustomSpinner className="w-10 h-10 text-[#0891B3] mb-3" /><p className="text-sm font-bold text-slate-700 tracking-wider">AI sedang merevisi kode...</p></div>}
                                                 
                                                 {editTab === 'settings' ? (
-                                                    <div className="flex-1 w-full bg-slate-50 border border-[#cbd5e1] rounded-lg overflow-y-auto custom-scroll p-4 shadow-inner flex flex-col justify-start gap-3">
+                                                    <div className="flex-1 w-full bg-slate-50 border border-[#cbd5e1] rounded-lg overflow-y-auto custom-scroll p-4 shadow-inner flex flex-col gap-6">
                                                         
                                                         {/* --- SECTION: DIMENSI & WAKTU --- */}
                                                         <div>
@@ -2087,7 +2073,7 @@ FOKUS UTAMA: Output HARUS dalam format JSON murni dengan struktur array "bluepri
 
                                                         {/* BAGIAN THUMBNAIL (STRUKTUR DIV DISAMAKAN DENGAN EKSTRAKSI WARNA) */}
                                                         <div className="mt-5">
-                                                            <h3 className="text-[10px] font-bold text-slate-500 mt-6 mb-3 uppercase tracking-widest border-b border-slate-200 pb-2">Pemilihan Thumbnail</h3>
+                                                            <h3 className="text-[10px] font-bold text-slate-500 mb-3 uppercase tracking-widest border-b border-slate-200 pb-2">Pemilihan Thumbnail</h3>
                                                             <div className="flex flex-col gap-3 p-3 bg-white border border-slate-200 rounded-lg shadow-sm">
                                                                 
                                                                 {/* Live Preview Iframe */}
