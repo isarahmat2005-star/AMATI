@@ -2100,31 +2100,30 @@ FOKUS UTAMA: Output HARUS dalam format JSON murni dengan struktur array "bluepri
                                                             </div>
                                                         </div>
 
-                                                        {/* --- SECTION: PEMILIHAN THUMBNAIL (PALING BAWAH) --- */}
-                                                        <div>
-                                                            <h3 className="text-[10px] font-bold text-slate-500 mb-3 uppercase tracking-widest border-b border-slate-200 pb-2">Pemilihan Thumbnail</h3>
-                                                            <div className="flex flex-col gap-3 bg-white p-4 border border-slate-200 rounded-lg shadow-sm">
-                                                                
-                                                                {/* Live Preview Iframe */}
-                                                                <div className="relative mx-auto bg-slate-100 rounded overflow-hidden shadow-inner border border-slate-300 flex items-center justify-center" style={{ height: '160px', width: `${160 * aspect}px`, maxWidth: '100%' }}>
+                                                        {/* BAGIAN THUMBNAIL (PROPORSIONAL + SLIDER TENGAH) */}
+                                                        <h3 className="text-[10px] font-bold text-slate-500 mb-3 uppercase tracking-widest border-b border-slate-200 pb-2">Pemilihan Thumbnail</h3>
+                                                        <div className="flex flex-col gap-4 bg-white p-4 border border-slate-200 rounded-lg shadow-sm mb-4">
+                                                            
+                                                            {/* Live Preview Iframe (Menggunakan teknik Aspect Ratio persis seperti tab Preview) */}
+                                                            <div className="w-full max-w-[320px] mx-auto">
+                                                                <div className="w-full relative bg-slate-100 rounded-lg overflow-hidden shadow-inner border border-slate-300" style={{ paddingBottom: `calc(${1 / aspect * 100}%)` }}>
                                                                     <iframe srcDoc={wrapSvgAsHtml(editCode, resStr, editCard?.duration || 10, 'thumbnail')} className="absolute inset-0 w-full h-full border-none pointer-events-none" sandbox="allow-scripts" scrolling="no" />
                                                                 </div>
-                                                                
-                                                                {/* Slider & Waktu Centered */}
-                                                                <div className="flex flex-col items-center gap-2 mt-2 w-full max-w-[80%] mx-auto">
-                                                                    <span className="text-[12px] font-bold text-[#0891B3] bg-[#0891B3]/10 border border-[#0891B3]/30 px-4 py-1 rounded-full shadow-sm text-center tabular-nums">
-                                                                        {parseFloat(editCode.match(/THUMB:(\d+(?:\.\d+)?)/i)?.[1] || ((editCard?.duration || 10) * 0.40)).toFixed(1)}s
-                                                                    </span>
-                                                                    <input type="range" min="0" max={editCard?.duration || 10} step="0.1" 
-                                                                        value={editCode.match(/THUMB:(\d+(?:\.\d+)?)/i)?.[1] || ((editCard?.duration || 10) * 0.40)} 
-                                                                        onChange={e => handleSettingsChange('thumb', parseFloat(e.target.value))} 
-                                                                        className="w-full cursor-pointer accent-[#0891B3] h-2 bg-slate-200 rounded-lg appearance-none" 
-                                                                    />
-                                                                </div>
-
                                                             </div>
-                                                        </div>
+                                                            
+                                                            {/* Slider & Waktu Centered */}
+                                                            <div className="flex flex-col items-center gap-2 mt-2 w-full mx-auto">
+                                                                <span className="text-[12px] font-bold text-white bg-[#0891B3] px-3 py-0.5 rounded-full leading-none tabular-nums shadow-sm">
+                                                                    {parseFloat(editCode.match(/THUMB:(\d+(?:\.\d+)?)/i)?.[1] || ((editCard?.duration || 10) * 0.39)).toFixed(1)}s
+                                                                </span>
+                                                                <input type="range" min="0" max={editCard?.duration || 10} step="0.1" 
+                                                                    value={editCode.match(/THUMB:(\d+(?:\.\d+)?)/i)?.[1] || ((editCard?.duration || 10) * 0.39)} 
+                                                                    onChange={e => handleSettingsChange('thumb', parseFloat(e.target.value))} 
+                                                                    className="w-full max-w-[80%] cursor-pointer accent-[#0891B3] h-1.5 bg-slate-200 rounded-lg appearance-none" 
+                                                                />
+                                                            </div>
 
+                                                        </div>
                                                     </div>
                                                 ) : editTab === 'preview' ? (
                                                     <iframe srcDoc={wrapSvgAsHtml(editCode, resStr, editCard?.duration, 'preview')} className="w-full h-full border-none block" sandbox="allow-scripts" />
