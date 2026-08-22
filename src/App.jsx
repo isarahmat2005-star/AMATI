@@ -2072,7 +2072,7 @@ FOKUS UTAMA: Output HARUS dalam format JSON murni dengan struktur array "bluepri
                                                         </div>
 
                                                         {/* BAGIAN THUMBNAIL (STRUKTUR DIV DISAMAKAN DENGAN EKSTRAKSI WARNA) */}
-                                                        <div className="mt-5">
+                                                        <div>
                                                             <h3 className="text-[10px] font-bold text-slate-500 mb-3 uppercase tracking-widest border-b border-slate-200 pb-2">Pemilihan Thumbnail</h3>
                                                             <div className="flex flex-wrap gap-3 p-3 bg-white border border-slate-200 rounded-lg shadow-sm">
                                                                 
