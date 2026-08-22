@@ -2043,7 +2043,7 @@ FOKUS UTAMA: Output HARUS dalam format JSON murni dengan struktur array "bluepri
                                                 {isRevising && <div className="absolute inset-0 z-20 bg-white/70 backdrop-blur-sm flex flex-col items-center justify-center rounded-lg"><CustomSpinner className="w-10 h-10 text-[#0891B3] mb-3" /><p className="text-sm font-bold text-slate-700 tracking-wider">AI sedang merevisi kode...</p></div>}
                                                 
                                                 {editTab === 'settings' ? (
-                                                    <div className="flex-1 w-full bg-slate-50 border border-[#cbd5e1] rounded-lg overflow-y-auto custom-scroll p-4 shadow-inner flex flex-col gap-6">
+                                                    <div className="flex-1 w-full bg-slate-50 border border-[#cbd5e1] rounded-lg overflow-y-auto custom-scroll p-4 shadow-inner flex flex-col justify-start gap-3">
                                                         
                                                         {/* --- SECTION: DIMENSI & WAKTU --- */}
                                                         <div>
