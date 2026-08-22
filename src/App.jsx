@@ -2100,26 +2100,24 @@ FOKUS UTAMA: Output HARUS dalam format JSON murni dengan struktur array "bluepri
                                                             </div>
                                                         </div>
 
-                                                        {/* BAGIAN THUMBNAIL (PROPORSIONAL + SLIDER DESAIN PLAYER BAR) */}
+                                                        {/* BAGIAN THUMBNAIL (PROPORSIONAL + SLIDER DESAIN PLAYER BAR FULL WIDTH) */}
                                                         <h3 className="text-[10px] font-bold text-slate-500 mb-3 uppercase tracking-widest border-b border-slate-200 pb-2">Pemilihan Thumbnail</h3>
                                                         <div className="flex flex-col gap-3 bg-white p-3 border border-slate-200 rounded-lg shadow-sm mb-4">
                                                             
-                                                            {/* Live Preview Iframe */}
-                                                            <div className="w-full max-w-[320px] mx-auto">
-                                                                <div className="w-full relative bg-slate-100 rounded-lg overflow-hidden shadow-inner border border-slate-300" style={{ paddingBottom: `calc(${1 / aspect * 100}%)` }}>
-                                                                    <iframe srcDoc={wrapSvgAsHtml(editCode, resStr, editCard?.duration || 10, 'thumbnail')} className="absolute inset-0 w-full h-full border-none pointer-events-none" sandbox="allow-scripts" scrolling="no" />
-                                                                </div>
+                                                            {/* Live Preview Iframe (Membentang Full) */}
+                                                            <div className="w-full relative bg-slate-100 rounded-lg overflow-hidden shadow-inner border border-slate-300" style={{ paddingBottom: `calc(${1 / aspect * 100}%)` }}>
+                                                                <iframe srcDoc={wrapSvgAsHtml(editCode, resStr, editCard?.duration || 10, 'thumbnail')} className="absolute inset-0 w-full h-full border-none pointer-events-none" sandbox="allow-scripts" scrolling="no" />
                                                             </div>
                                                             
-                                                            {/* Slider ala Player Bar (Tanpa Tombol Play) */}
+                                                            {/* Slider ala Player Bar (Tanpa Tombol Play - Membentang Full) */}
                                                             {(() => {
                                                                 const currentDur = editCard?.duration || 10;
                                                                 const thumbMatch = editCode.match(/THUMB:(\d+(?:\.\d+)?)/i);
-                                                                const thumbVal = thumbMatch ? parseFloat(thumbMatch[1]) : (currentDur * 0.39);
+                                                                const thumbVal = thumbMatch ? parseFloat(thumbMatch[1]) : (currentDur * 0.40);
                                                                 const thumbPercent = Math.min(100, Math.max(0, (thumbVal / currentDur) * 100));
 
                                                                 return (
-                                                                    <div className="w-full max-w-[320px] mx-auto h-[44px] bg-white border border-[#0891B3] rounded-lg px-4 flex items-center gap-3 shrink-0 shadow-sm relative z-10 box-border">
+                                                                    <div className="w-full h-[44px] bg-white border border-[#0891B3] rounded-lg px-4 flex items-center gap-3 shrink-0 shadow-sm relative z-10 box-border">
                                                                         
                                                                         {/* Garis Track & Slider */}
                                                                         <div className="flex-1 h-[6px] bg-slate-200 rounded-full relative flex items-center">
